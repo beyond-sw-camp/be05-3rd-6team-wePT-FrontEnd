@@ -1,0 +1,33 @@
+@import 'global.css';
+
+#app {
+    margin: 0;
+    font-weight: normal;
+}
+
+.button-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.two-button-wrapper {
+    display: flex;
+    justify-content: space-between;
+}
+
+.main-title {
+    width: 100%;
+    margin-bottom: 20px;
+    font-size: 2rem;
+    font-weight: 800;
+    background-image: linear-gradient(to left, #87CEEB, #38b036);
+    color: transparent;
+    background-clip: text;
+    -webkit-background-clip: text;
+}
+
+
+.form-wrapper {
+    display: flex;
+    flex-direction: column;
+}

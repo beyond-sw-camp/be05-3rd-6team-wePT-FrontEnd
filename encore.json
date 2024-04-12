@@ -1,0 +1,39 @@
+{
+  "works": [
+    {
+      "id": 1,
+      "subject": "success",
+      "completed": false
+    },
+    {
+      "id": 2,
+      "subject": "failure",
+      "completed": false
+    },
+    {
+      "id": 3,
+      "subject": "success",
+      "completed": true
+    },
+    {
+      "id": 4,
+      "subject": "failure",
+      "completed": true
+    },
+    {
+      "id": 1712813603997,
+      "subject": "setsetsetset",
+      "computed": false
+    },
+    {
+      "id": 1712814234449,
+      "subject": "test",
+      "computed": false
+    },
+    {
+      "id": 1712814241880,
+      "subject": "test2",
+      "computed": false
+    }
+  ]
+}
