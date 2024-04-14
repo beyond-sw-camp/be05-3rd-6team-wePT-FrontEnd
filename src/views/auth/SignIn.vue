@@ -95,6 +95,10 @@ const checkCertNumber = () => {
 }
 
 const validatePassword = () => {
+    if (!isCert.value) {
+        modalHandler.open('인증 필요', '이메일 인증부터 완료해주세요.', false)
+        return
+    }
     if (!params.value.password || !params.value.passwordCheck) {
         modalHandler.open('비밀번호 미입력', '비밀번호를 입력해주세요.', false)
         return
