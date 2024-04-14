@@ -8,9 +8,14 @@
                               class='mb-2'></b-form-input>
                 <div class='m-2'>비밀번호</div>
                 <b-form-input type='password' v-model='params.password' placeholder='비밀번호를 입력하세요.'></b-form-input>
-                <b-button class='mt-3 ms-auto' style='background-color: var(--primary-color);
+                <b-button class='mt-5' style='background-color: var(--primary-color);
                            border-color: var(--primary-color);' @click='validateAndSubmit'>로그인
                 </b-button>
+                <div class='mt-1 d-flex flex-row justify-content-center align-items-center gap-3'>
+                    <a class='find-button'>아이디 찾기</a>
+                    <div>|</div>
+                    <a class='find-button'>비밀번호 찾기</a>
+                </div>
             </div>
         </div>
     </section>
@@ -46,5 +51,12 @@ const validateAndSubmit = () => {
     display: flex;
     flex-direction: column;
     margin-bottom: 20px;
+}
+
+.find-button {
+    text-underline-mode: true;
+    font-size: small;
+    font-weight: 500;
+    color: var(--primary-color);
 }
 </style>

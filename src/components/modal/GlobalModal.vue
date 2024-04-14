@@ -45,7 +45,7 @@ const props = defineProps({
     successButton: Boolean,
 })
 
-watch(() => props.successButton, (value) => {
+watch(() => props.buttonDisplay, (value) => {
     console.log(':::::::::::::::', value)
 })
 

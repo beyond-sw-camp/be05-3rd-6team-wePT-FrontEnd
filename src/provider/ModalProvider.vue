@@ -32,6 +32,7 @@ const modalHandler = {
     buttonAction: ref(() => {
     }),
 
+
     /**
      * 모달을 전체 커스텀하고 싶을 때 사용
      * @param title
@@ -60,7 +61,7 @@ const modalHandler = {
         this.title.value = title
         this.content.value = content
         this.successButton.value = true
-        this.buttonDisplay = false
+        this.buttonDisplay.value = false
     },
 
     close() {

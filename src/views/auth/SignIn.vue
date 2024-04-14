@@ -61,16 +61,9 @@ const isSame = ref()
 const isCert = ref()
 
 
-// // params 객체 감시
-// watch(params, (newParams) => {
-//     console.log('params 변경됨:', newParams)
-// }, { deep: true })// deep 옵션을 사용하여 중첩된 객체 감시
-
 watch(() => params.value.email, (newEmail) => {
     isRightEmail.value = emailCheck(newEmail)
 })
-
-// watch([isSend.value, isSame.value], () => {})
 
 const handleEmailButton = () => {
     isSend.value ? checkCertNumber() : sendEmail()
@@ -130,8 +123,9 @@ const onSubmit = () => {
     // TODO: 폼 제출 로직
     console.log(':::::: success :::::::')
 
-    modalHandler.openSuccess('가입 성공', '회원가입에 성공했습니다.', true, '확인', () => {
-        router.push('/')
+    modalHandler.open('가입 성공', '회원가입에 성공했습니다.', true, '로그인 하기', () => {
+        router.push('/login')
+        modalHandler.close()
     })
 }
 
