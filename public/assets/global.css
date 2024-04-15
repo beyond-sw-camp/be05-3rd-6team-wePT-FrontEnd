@@ -11,5 +11,11 @@
     --secondary-color: #87CEEB;
     --third-color: #FFFDD0;
     --dark-color: #707070;
+
+    --danger-color: #dc3545;
+    --danger-bg: #f8d7da;
+
+    --success-color: #28a745;
+    --success-bg: #d4edda;
 }
 
