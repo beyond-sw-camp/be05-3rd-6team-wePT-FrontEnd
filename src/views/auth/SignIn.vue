@@ -6,7 +6,9 @@
                 <div class='m-2'>이메일</div>
                 <b-form-input class='mb-2 input-something' :state='isRightEmail' v-model='params.email'
                               placeholder='이메일을 입력하세요.' />
-                <b-form-input v-if='isSend' :state='isCert' v-model='certNumber' placeholder='인증번호를 입력하세요.' />
+                <!--                <b-form-input v-if='isSend' :state='isCert' v-model='certNumber' placeholder='인증번호를 입력하세요.' />-->
+                <div v-if='!isCert' class='ms-auto'>인증이 완료되지 않았습니다.</div>
+                <div v-if='isCert' class='ms-auto'>인증이 완료되었습니다.</div>
                 <div class='d-flex flex-col mt-3'>
                     <b-button v-if='isSend' class='ms-auto button-primary' size='sm'>재인증</b-button>
                     <b-button :class="isSend ? 'button-primary' : 'ms-auto button-primary'" size='sm'
@@ -39,6 +41,7 @@
 import { inject, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { emailCheck } from '@/lib/util.js'
+import { auth } from '@/firebase/index.js'
 
 const router = useRouter()
 const modalHandler = inject('modalHandler')
@@ -69,14 +72,30 @@ const handleEmailButton = () => {
     isSend.value ? checkCertNumber() : sendEmail()
 }
 
-const sendEmail = () => {
+const sendEmail = async () => {
     if (!isRightEmail.value) {
         modalHandler.open('이메일 형식 오류', '이메일이 아닙니다', false)
         return
     }
     // TODO: 이메일 중복 검사 로직 (API)
     // TODO: 이메일 인증 메일 발송 로직 (API) - true일 경우에만 isSend를 true로 변경
-    isSend.value = true
+
+    const actionCodeSettings = {
+        // Firebase console에서 설정한 URL, 사용자가 인증 링크를 클릭했을 때 리디렉션될 URL
+        url: 'http://localhost:8080/finishSignUp',
+        handleCodeInApp: true,
+    }
+
+
+    try {
+        await auth.sendSignInLinkToEmail(params.value.email, actionCodeSettings)
+        window.localStorage.setItem('emailForSignIn', params.value.email)
+        modalHandler.openSuccess('인증 메일 발송', '인증 링크가 발송되었습니다. 메일을 확인해주세요.')
+        isSend.value = true
+    } catch (error) {
+        modalHandler.open('인증 메일 발송 실패', '인증 메일 발송에 실패했습니다.', false)
+        console.error('Error sending email link', error)
+    }
 }
 
 // TODO: 인증번호 받아오는 로직 필요

@@ -1,5 +1,4 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import IntroView from '@/views/Intro.vue'
 import IntroLayout from '@/layouts/lntroLayout.vue'
 import AuthLayout from '@/layouts/AuthLayout.vue'
 
@@ -9,7 +8,7 @@ const router = createRouter({
         {
             path: '/',
             name: 'Intro',
-            component: IntroView,
+            component: () => import('@/views/Intro.vue'),
             meta: { layout: IntroLayout },
         },
         {
