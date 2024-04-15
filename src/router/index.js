@@ -40,6 +40,7 @@ const router = createRouter({
             path: '/matching/update',
             name: 'Update',
             component: () => import('@/views/matching/Update.vue'),
+            meta: { layout: MatchingLayout },
         },
     ],
 })

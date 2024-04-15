@@ -1,16 +1,16 @@
 <template>
     <div style='width: 100dvw'>
-        <div class='main-title'>매칭 생성</div>
+        <div class='main-title'>매칭 수정</div>
         <div class='d-flex flex-row justify-content-end'>
             <button class='btn btn-danger' @click='cancel'>취소</button>
+            <button class='btn btn-danger' style='margin-left: 1rem' @click='deleteMatching'>매칭 삭제</button>
             <button class='btn btn-success' style='margin-left: 1rem' @click='save'>저장</button>
         </div>
 
-
-        <div class='mt-1 w-100'>
+        <div class=' mt-5'>
             <div class='row'>
                 <div>
-                    <div class='form-group w-100'>
+                    <div class='form-group'>
                         <label for='title'>제목</label>
                         <input type='text' id='title' v-model='title' class='form-control' placeholder='제목을 입력하세요.'>
                     </div>
@@ -31,7 +31,7 @@
                     </div>
                     <div class='form-group'>
                         <br>
-                        <label for='number'>인원 선택 (최대 10명)</label>
+                        <label for='number'>인원 선택 (최대 10명) 현재 {{ this.status_number }}명</label>
                         <select id='number' v-model='numberDropdown' class='form-control'>
                             <option value='1'>1</option>
                             <option value='2'>2</option>
@@ -59,60 +59,95 @@
 </template>
 
 <script setup>
+
 import axios from 'axios'
+import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { inject, ref } from 'vue'
 
-const router = useRouter()
-const modalHandler = inject('modalHandler')
-
-// 반응적인 상태를 생성합니다.
 const title = ref('')
 const date = ref(new Date().toISOString().substr(0, 10))
 const categoryDropdown = ref('delivery')
 const numberDropdown = ref('1')
 const content = ref('')
+const status_number = ref('')
 
-const save = () => {
-    const newData = {
-        id: new Date().getTime(),
-        title: title.value, // ref로 생성한 상태에는 .value로 접근합니다.
+const router = useRouter()
+
+const fetchData = async () => {
+    let id = router.currentRoute.value.params.id
+    // id = 1;
+    try {
+        const response = await axios.get(`http://localhost:3000/insert/${id}`)
+        const data = response.data
+
+        title.value = data.title
+        date.value = data.date
+        categoryDropdown.value = data.category
+        numberDropdown.value = data.limit_number
+        content.value = data.content
+        status_number.value = data.status_number
+    } catch (error) {
+        console.error('Failed to fetch data:', error)
+    }
+}
+
+onMounted(() => {
+    fetchData()
+})
+
+const save = async () => {
+    const id = router.currentRoute.value.params.id
+
+    const updatedData = {
+        id: id,
+        title: title.value,
         date: date.value,
         category: categoryDropdown.value,
         limit_number: numberDropdown.value,
-        status_number: 0,
+        status_number: status_number.value,
         content: content.value,
     }
 
-    axios.post('http://localhost:3000/insert', newData)
-        .then(response => {
-            modalHandler.openSuccess('데이터 저장 성공', '데이터가 성공적으로 저장되었습니다.')
-            console.log(response)
-            // 저장 후에 입력 필드를 비웁니다.
-            title.value = ''
-            date.value = new Date().toISOString().substr(0, 10)
-            categoryDropdown.value = 'delivery'
-            numberDropdown.value = '1'
-            content.value = ''
-        })
-        .catch(error => {
-            console.error('Failed to save data:', error)
-            modalHandler.open('저장 실패', '데이터를 저장하는 데 실패했습니다.', false)
-        })
+    try {
+        const response = await axios.put(`http://localhost:3000/insert/${id}`, updatedData)
+        alert('저장되었습니다.')
+        console.log(response)
+    } catch (error) {
+        console.error('Failed to update data:', error)
+        alert('데이터를 수정하는 데 실패했습니다.')
+    }
 }
 
 const cancel = () => {
     router.go(-1)
 }
 
+const deleteMatching = async () => {
+    let id = router.currentRoute.value.params.id
+    // id = 1;
+
+    try {
+        const response = await axios.delete(`http://localhost:3000/insert/${id}`)
+        alert('매칭이 삭제되었습니다.')
+        console.log(response)
+        await router.push('/') // 삭제 후 홈페이지로 이동
+    } catch (error) {
+        console.error('Failed to delete data:', error)
+        alert('매칭을 삭제하는 데 실패했습니다.')
+    }
+}
 
 </script>
 
-
 <style scoped>
-/* scoped 속성을 사용하여 컴포넌트 스타일링 */
 .color {
-    color: var(--primary-color);
+    color: #38b036;
+}
+
+.main-header {
+    background: linear-gradient(135deg, #32a029 0%, #38b036 50%, #3fc143 100%);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 10px 0;
 }
 
 .navbar a {
