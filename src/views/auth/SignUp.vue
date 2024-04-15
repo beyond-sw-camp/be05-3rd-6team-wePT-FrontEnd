@@ -80,7 +80,7 @@ const isSame = ref()
 const isCert = ref()
 
 const actionCodeSettings = {
-    url: 'http://localhost:5173/sign-in',
+    url: 'http://localhost:5173/sign-up',
     handleCodeInApp: true,
 }
 
