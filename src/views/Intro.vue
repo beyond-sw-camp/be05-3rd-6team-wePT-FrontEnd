@@ -33,7 +33,7 @@ const goToLogin = () => {
 }
 
 const goToSignIn = () => {
-    router.push('/sign-in')
+    router.push('/sign-up')
 }
 </script>
 <style>
