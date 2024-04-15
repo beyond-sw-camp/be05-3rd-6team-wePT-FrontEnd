@@ -12,9 +12,9 @@
                            border-color: var(--primary-color);' @click='onSubmit'>로그인
                 </b-button>
                 <div class='mt-1 d-flex flex-row justify-content-center align-items-center gap-3'>
-                    <a class='find-button'>아이디 찾기</a>
+                    <div class='find-button' @click='showToast'>아이디 찾기</div>
                     <div>|</div>
-                    <a class='find-button'>비밀번호 찾기</a>
+                    <router-link to='/password-reset' class='find-button'>비밀번호 찾기</router-link>
                 </div>
             </div>
         </div>
@@ -22,11 +22,15 @@
 </template>
 <script setup>
 import { inject, ref } from 'vue'
+
+import { useRouter } from 'vue-router'
 import { auth } from '@/firebase/index.js'
 import { signInWithEmailAndPassword } from 'firebase/auth'
-import { useRouter } from 'vue-router'
+import { useToast } from 'vue-toastification'
+
 
 const router = useRouter()
+const toast = useToast()
 const modalHandler = inject('modalHandler')
 const params = ref({
     email: '',
@@ -55,6 +59,12 @@ const validateParams = () => {
     }
 }
 
+const showToast = () => {
+    toast.success('아이디는 가입하신 이메일입니다.', {
+        position: 'bottom-right',
+        timeout: 2000,
+    })
+}
 
 </script>
 <style>
@@ -65,7 +75,7 @@ const validateParams = () => {
 }
 
 .find-button {
-    text-underline-mode: true;
+    text-decoration: underline;
     font-size: small;
     font-weight: 500;
     color: var(--primary-color);
