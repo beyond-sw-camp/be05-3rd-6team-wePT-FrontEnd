@@ -8,6 +8,7 @@ import { useAuthStore } from '@/stores/auth.js'
 // layouts
 import IntroLayout from '@/layouts/lntroLayout.vue'
 import AuthLayout from '@/layouts/AuthLayout.vue'
+import MatchingLayout from '@/layouts/MatchingLayout.vue'
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -41,6 +42,18 @@ const router = createRouter({
             name: 'Main',
             component: () => import('@/views/Main.vue'),
             meta: { requiresAuth: true },
+        },
+        {
+            path: '/matching/insert',
+            name: 'Insert',
+            component: () => import('@/views/matching/Insert.vue'),
+            meta: { layout: MatchingLayout },
+        },
+        {
+            path: '/matching/update',
+            name: 'Update',
+            component: () => import('@/views/matching/Update.vue'),
+            meta: { layout: MatchingLayout },
         },
     ],
 })
