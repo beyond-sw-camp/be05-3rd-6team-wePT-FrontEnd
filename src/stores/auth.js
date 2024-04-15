@@ -1,9 +1,7 @@
 import { defineStore } from 'pinia'
 import { onAuthStateChanged, signOut } from 'firebase/auth'
 import { auth } from '@/firebase/index.js'
-import { useRouter } from 'vue-router'
-
-let router
+import router from '@/router'
 
 export const useAuthStore = defineStore('auth', {
     state: () => ({
@@ -11,10 +9,9 @@ export const useAuthStore = defineStore('auth', {
     }),
     actions: {
         initAuth() {
-            router = useRouter()
             onAuthStateChanged(auth, user => {
                 this.user = user
-                if (!user) {
+                if (!user && router) {
                     router.push('/login')
                 }
             })
