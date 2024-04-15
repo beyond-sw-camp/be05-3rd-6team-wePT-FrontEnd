@@ -30,7 +30,7 @@
 
 <script setup>
 // TODO: variant 문제 해결하
-import { defineEmits, defineProps, inject, watch } from 'vue'
+import { defineEmits, defineProps, inject } from 'vue'
 
 const emits = defineEmits(['close'])
 const modalHandler = inject('modalHandler')
@@ -43,10 +43,6 @@ const props = defineProps({
     buttonDisplay: Boolean,
     buttonAction: Function,
     successButton: Boolean,
-})
-
-watch(() => props.buttonDisplay, (value) => {
-    console.log(':::::::::::::::', value)
 })
 
 </script>
