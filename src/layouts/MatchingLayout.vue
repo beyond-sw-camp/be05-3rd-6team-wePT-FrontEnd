@@ -13,6 +13,7 @@ import Header from '@/components/layout/Header.vue'
     display: flex;
     justify-content: center;
     align-items: center;
+    flex-direction: column;
     padding: 1rem;
 }
 </style>
