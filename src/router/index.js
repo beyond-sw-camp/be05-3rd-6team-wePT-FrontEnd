@@ -9,6 +9,7 @@ import { useAuthStore } from '@/stores/auth.js'
 import IntroLayout from '@/layouts/lntroLayout.vue'
 import AuthLayout from '@/layouts/AuthLayout.vue'
 import MatchingLayout from '@/layouts/MatchingLayout.vue'
+import MainLayout from '@/layouts/MainLayout.vue'
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -54,6 +55,12 @@ const router = createRouter({
             name: 'Update',
             component: () => import('@/views/matching/Update.vue'),
             meta: { layout: MatchingLayout, requiresAuth: true },
+        },
+        {
+            path: '/my-page',
+            name: 'MyPage',
+            component: () => import('@/views/myPage/MyPage.vue'),
+            meta: { layout: MainLayout, requiresAuth: true },
         },
     ],
 })
