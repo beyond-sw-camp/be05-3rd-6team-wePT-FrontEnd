@@ -91,6 +91,7 @@ onMounted(() => {
 
 watch(() => params.value.email, (newEmail) => {
     isRightEmail.value = emailCheck(newEmail)
+
     if (newEmail) {
         window.localStorage.setItem('emailForSignIn', newEmail)
     }
@@ -102,7 +103,7 @@ const onSendEmail = async () => {
         return
     }
     try {
-        await validateDuplicateEmail()
+        if (!await validateDuplicateEmail()) return
 
         await sendSignInLinkToEmail(auth, params.value.email, actionCodeSettings)
         window.localStorage.setItem('emailForSignIn', params.value.email)
@@ -117,7 +118,7 @@ const onSendEmail = async () => {
 
 
 const onSubmit = async () => {
-    validateCertification()
+    if (!validateCertification()) return
 
     for (let key in params.value) {
         if (!params.value[key]) {
@@ -161,7 +162,8 @@ const checkEmailVerification = async () => {
 }
 
 const checkPassword = () => {
-    validateCertification()
+    if (!validateCertification()) return
+
     if (!params.value.password || !params.value.passwordCheck) {
         modalHandler.open('비밀번호 미입력', '비밀번호를 입력해주세요.', false)
         return
@@ -178,13 +180,17 @@ const validateDuplicateEmail = async () => {
     const users = await fetchSignInMethodsForEmail(auth, params.value.email)
     if (users.length > 0) {
         modalHandler.open('이메일 중복', '이미 가입된 이메일입니다.', false)
+        return false
     }
+    return true
 }
 
 const validateCertification = () => {
     if (!isCert.value) {
         modalHandler.open('인증 필요', '이메일 인증부터 완료해주세요.', false)
+        return false
     }
+    return true
 }
 
 const goIntro = () => {

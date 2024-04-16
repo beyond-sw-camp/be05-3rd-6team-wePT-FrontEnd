@@ -15,6 +15,7 @@ import { ref, watch } from 'vue'
 import { sendPasswordResetEmail } from 'firebase/auth'
 import { auth } from '@/firebase/index.js'
 import { useToast } from 'vue-toastification'
+import { useRouter } from 'vue-router'
 
 // lib
 import { emailCheck } from '@/lib/util.js'
@@ -23,6 +24,7 @@ import { authMessages } from '@/lib/const.js'
 const toast = useToast()
 const email = ref('')
 const isRightEmail = ref()
+const router = useRouter()
 
 const {
     PASSWORD_RESET_SUCCESS,
@@ -37,7 +39,10 @@ watch(() => email.value, (newEmail) => {
 })
 
 const onHandleResetPassword = async () => {
-    validateEmail()
+
+    if (!validateEmail()) {
+        return
+    }
 
     try {
         await sendPasswordResetEmail(auth, email.value)
@@ -45,6 +50,9 @@ const onHandleResetPassword = async () => {
             position: 'bottom-right',
             timeout: 5000,
         })
+        setTimeout(async () => {
+            await router.push('/login')
+        }, 10000)
     } catch (err) {
         console.error('Firebase error: ', err)
         console.error('Error code: ', err.code) // 에러 코드 확인
@@ -69,7 +77,7 @@ const validateEmail = () => {
             position: 'bottom-right',
             timeout: 2000,
         })
-        return
+        return false
     }
 
     if (!isRightEmail.value) {
@@ -77,7 +85,10 @@ const validateEmail = () => {
             position: 'bottom-right',
             timeout: 2000,
         })
+        return false
     }
+
+    return true
 }
 </script>
 <style scoped>

@@ -38,7 +38,7 @@ const params = ref({
 })
 
 const onSubmit = async () => {
-    validateParams()
+    if (!validateParams()) return
 
     try {
         await signInWithEmailAndPassword(auth, params.value.email, params.value.password)
@@ -52,11 +52,13 @@ const onSubmit = async () => {
 const validateParams = () => {
     if (!params.value.email) {
         modalHandler.open('이메일을 입력해주세요.', '이메일을 입력해주세요.', false)
-        return
+        return false
     }
     if (!params.value.password) {
         modalHandler.open('비밀번호를 입력해주세요.', '비밀번호를 입력해주세요.', false)
+        return false
     }
+    return true
 }
 
 const showToast = () => {
