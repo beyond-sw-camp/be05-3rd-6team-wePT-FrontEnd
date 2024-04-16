@@ -10,7 +10,7 @@ import Header from '@/components/layout/Header.vue'
 <style scoped>
 .main-layout {
     padding: 1rem;
-    max-height: calc(100vh - 40px);
+    max-height: 100vh;
     overflow: hidden;
 }
 </style>
