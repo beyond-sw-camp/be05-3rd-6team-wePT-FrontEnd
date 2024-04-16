@@ -7,7 +7,7 @@
             <button class='btn btn-success' style='margin-left: 1rem' @click='save'>저장</button>
         </div>
 
-        <div class=' mt-5'>
+        <div class='mt-2'>
             <div class='row'>
                 <div>
                     <div class='form-group'>
@@ -47,10 +47,16 @@
                     </div>
                     <div class='form-group'>
                         <br>
-                        <label for='content'>내용</label>
+                        <label for='content' style='margin-bottom: 1rem'>내용</label>
                         <br>
-                        <textarea id='content' v-model='content' class='form-control' rows='5'
-                                  placeholder='내용을 입력하세요.'></textarea>
+                        <textarea
+                            id='content'
+                            v-model='content'
+                            class='form-control'
+                            rows='5'
+                            placeholder='내용을 입력하세요.'
+                            style='width: 100%; height: 230px; overflow-y: auto;'
+                        ></textarea>
                     </div>
                 </div>
             </div>

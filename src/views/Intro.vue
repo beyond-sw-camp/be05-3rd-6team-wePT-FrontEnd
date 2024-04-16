@@ -1,5 +1,5 @@
 <template>
-    <section>
+    <section style='width: 100%'>
         <div class='intro-wrapper'>
             <div class='logo-wrapper'>
                 <Logo src='../../public/assets/wePT_logo.svg' altText='wePT-Logo' />

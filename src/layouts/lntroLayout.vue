@@ -13,5 +13,6 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    max-height: 100vh;
 }
 </style>

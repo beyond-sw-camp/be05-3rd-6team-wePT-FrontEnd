@@ -20,7 +20,7 @@
                     <div class='col-md-9 col-6'>{{ params.id }}</div>
                 </div>
                 <div class='row'>
-                    <div class='col-md-3 col-6 font-weight-bold'>구인 인원수:</div>
+                    <div class='col-md-3 col-6 font-weight-bold'>인원 수:</div>
                     <div class='col-md-9 col-6'>{{ params.status_number }} / {{ params.limit_number }}</div>
                 </div>
             </div>

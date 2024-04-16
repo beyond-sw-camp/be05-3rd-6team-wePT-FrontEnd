@@ -191,17 +191,16 @@ const getParticipateMatchingData = () => {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-
-    ::-webkit-scrollbar {
-        display: none;
-    }
 }
 
 .card-container {
     display: none;
     overflow-y: auto;
-    max-height: 700px;
     padding: 1rem;
+
+    ::-webkit-scrollbar {
+        display: none;
+    }
 }
 
 .main-card {

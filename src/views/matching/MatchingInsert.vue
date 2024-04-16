@@ -1,5 +1,5 @@
 <template>
-    <div style='width: 100%'>
+    <section style='width: 100%'>
         <div class='main-title'>매칭 생성</div>
         <div class='d-flex flex-row justify-content-end'>
             <button class='btn btn-danger' @click='cancel'>취소</button>
@@ -7,10 +7,10 @@
         </div>
 
 
-        <div class='mt-1 w-100'>
+        <div class='mt-1'>
             <div class='row'>
                 <div>
-                    <div class='form-group w-100'>
+                    <div class='form-group'>
                         <label for='title'>제목</label>
                         <input type='text' id='title' v-model='title' class='form-control' placeholder='제목을 입력하세요.'>
                     </div>
@@ -46,16 +46,21 @@
                         </select>
                     </div>
                     <div class='form-group'>
-                        <br>
-                        <label for='content'>내용</label>
-                        <br>
-                        <textarea id='content' v-model='content' class='form-control' rows='5'
-                                  placeholder='내용을 입력하세요.'></textarea>
+                        <br />
+                        <label for='content' style='margin-bottom: 1rem'>내용</label>
+                        <textarea
+                            id='content'
+                            v-model='content'
+                            class='form-control text-area-class'
+                            rows='5'
+                            placeholder='내용을 입력하세요.'
+                            style='width: 100%; height: 230px; overflow-y: auto;'
+                        ></textarea>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
+    </section>
 </template>
 
 <script setup>
@@ -107,9 +112,7 @@ const cancel = () => {
 
 
 </script>
-
-
-<style scoped>
+<style>
 /* scoped 속성을 사용하여 컴포넌트 스타일링 */
 .color {
     color: var(--primary-color);
@@ -118,4 +121,5 @@ const cancel = () => {
 .navbar a {
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
 }
+
 </style>
