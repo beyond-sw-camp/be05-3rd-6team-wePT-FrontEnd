@@ -3,7 +3,7 @@ import { db } from '@/firebase/index.js';
 
 // 사용자 (전체) 출력 
 export const fetchUsers = async () => {
-    const UserCollection = collection(db, 'Users');
+    const UserCollection = collection(db, 'User');
     const users = [];
     try {
         const querySnapshot = await getDocs(UserCollection);
@@ -18,12 +18,12 @@ export const fetchUsers = async () => {
 
 // 문서 전체 출력 (3개 분야별로) id로 넣어줘야함
 export const FindPosts = async (id) => {
-    const UserCollection = collection(db, 'Users');
+    const UserCollection = collection(db, 'User');
     const postList = [];
     try {
         const querySnapshot = await getDocs(UserCollection);
         await Promise.all(querySnapshot.docs.map(async (doc) => {
-            const postCollection = collection(doc.ref, 'Post');
+            const postCollection = collection(doc.ref, 'Matching');
             const q = query(postCollection, where('matchingCategory', '==', id));
             const querySnapshot = await getDocs(q);
             querySnapshot.forEach(pDoc => {
@@ -40,12 +40,12 @@ export const FindPosts = async (id) => {
 
 // 세부 문서 출력 (매칭 신청한 id 까지)
 export const postDetail = async (matchingId) => {
-    const UserCollection = collection(db, 'Users');
+    const UserCollection = collection(db, 'User');
     const post = [];
     try {
         const querySnapshot = await getDocs(UserCollection);
         await Promise.all(querySnapshot.docs.map(async (doc) => {
-            const postCollection = collection(doc.ref, 'Post');
+            const postCollection = collection(doc.ref, 'Matching');
             const q = query(postCollection, where('matchingId', '==', matchingId));
             const querySnapshot = await getDocs(q);
             querySnapshot.forEach(pDoc => {
@@ -61,13 +61,13 @@ export const postDetail = async (matchingId) => {
 
 // 내 문서(매칭 글 작성) 출력
 export const FindMyPost = async (userId) => {
-    const UserCollection = collection(db, 'Users');
-    const userQuery = query(UserCollection, where('userId', '==', userId));
+    const UserCollection = collection(db, 'User');
+    const userQuery = query(UserCollection, where('userEmail', '==', userId));
     const postList = [];
     try {
         const querySnapshot = await getDocs(userQuery);
         await Promise.all(querySnapshot.docs.map(async (doc) => {
-            const postCollection = collection(doc.ref, 'Post');
+            const postCollection = collection(doc.ref, 'Matching');
             const querySnapshot = await getDocs(postCollection);
             querySnapshot.forEach(pDoc => {
                 console.log(pDoc.data());
@@ -82,13 +82,13 @@ export const FindMyPost = async (userId) => {
 
 // 내 댓글(매칭 참여) 출력
 export const FindMyComments = async (userId) => {
-    const UserCollection = collection(db, 'Users');
-    const userQuery = query(UserCollection, where('userId', '==', userId));
+    const UserCollection = collection(db, 'User');
+    const userQuery = query(UserCollection, where('userEmail', '==', userId));
     const commentList = [];
     try {
         const querySnapshot = await getDocs(userQuery);
         await Promise.all(querySnapshot.docs.map(async (doc) => {
-            const commentCollection = collection(doc.ref, 'Comments');
+            const commentCollection = collection(doc.ref, 'Join');
             const querySnapshot = await getDocs(commentCollection);
             querySnapshot.forEach(pDoc => {
                 console.log(pDoc.data());
@@ -103,8 +103,8 @@ export const FindMyComments = async (userId) => {
 
 // 글 작성 / postData는 사용 파일에서 넣어주어야함
 export const addPost = async (userId, postData) => {
-    const UserCollection = collection(db, 'Users');
-    const userQuery = query(UserCollection, where('userId', '==', userId));
+    const UserCollection = collection(db, 'User');
+    const userQuery = query(UserCollection, where('userEmail', '==', userId));
 
     try {
         // 사용자 문서에서 사용자 정보 가져오기
@@ -114,7 +114,7 @@ export const addPost = async (userId, postData) => {
             // 사용자 문서가 존재하면 사용자의 포스트 컬렉션에 데이터 추가
             querySnapshot.forEach(doc => {
                 const userRef = doc.ref;
-                const postCollection = collection(userRef, 'Post');
+                const postCollection = collection(userRef, 'Matching');
                 addDoc(postCollection, postData).then(() => {
                     console.log('포스트가 사용자의 포스트 컬렉션에 추가되었습니다.');
                 }).catch(error => {
@@ -132,20 +132,19 @@ export const addPost = async (userId, postData) => {
 // 글 수정
 export const updatePost = async (userId, matchingId, newData) => {
     try {
-        const UserCollection = collection(db, 'Users');
-        const userQuery = query(UserCollection, where('userId', '==', userId));
+        const UserCollection = collection(db, 'User');
+        const userQuery = query(UserCollection, where('userEmail', '==', userId));
         const userQuerySnapshot = await getDocs(userQuery);
         console.log('a');
         if (!userQuerySnapshot.empty) {
             const userDoc = userQuerySnapshot.docs[0];
             if (userDoc) {
-                const postCollection = collection(db, `Users/${userDoc.id}/Post`);
+                const postCollection = collection(db, `Users/${userDoc.id}/Matching`);
                 const postQuery = query(postCollection, where('matchingId', '==', matchingId));
         
                 const postQuerySnapshot = await getDocs(postQuery);
 
                 if (!postQuerySnapshot.empty) {
-                    console.log('a');
                     const postId =  postQuerySnapshot.docs[0].id;
                     const postRef = doc(postCollection, postId);
                     await updateDoc(postRef, newData);
@@ -166,12 +165,12 @@ export const updatePost = async (userId, matchingId, newData) => {
 // 글 삭제
 export const deletePost = async (userEmail, matchingId) => {
     try {
-        const userId = await findDocumentIdByField(collection(db, 'Users'), 'userId', userEmail);
-        const userDocRef = doc(db, 'Users', userId);
-        const collectionInput = collection(userDocRef, 'Post');
+        const userId = await findDocumentIdByField(collection(db, 'User'), 'userEmail', userEmail);
+        const userDocRef = doc(db, 'User', userId);
+        const collectionInput = collection(userDocRef, 'Matching');
         const postId = await findDocumentIdByField(collectionInput, 'matchingId', matchingId);
         if (postId) {
-            const postDocRef = doc(db, 'Users', userId, 'Post', postId);
+            const postDocRef = doc(db, 'User', userId, 'Matching', postId);
             await deleteDoc(postDocRef);
             console.log('포스트가 성공적으로 삭제되었습니다.');
         } else {
@@ -204,19 +203,18 @@ export const findDocumentIdByField = async (collectionInput, field, value) => {
 
 export const addComment = async (userEmail, matchingId) => {
     try {
-        console.log('userEmail', userEmail);
-        const userId = await findDocumentIdByField(collection(db, 'Users'), 'userId', userEmail);
+        const userId = await findDocumentIdByField(collection(db, 'User'), 'userEmail', userEmail);
         console.log(userId);
-        const userDocRef = doc(db, 'Users', userId);
+        const userDocRef = doc(db, 'User', userId);
         console.log('aa');
-        const collectionInput = collection(userDocRef, 'Post');
+        const collectionInput = collection(userDocRef, 'Matching');
         const postId = await findDocumentIdByField(collectionInput, 'matchingId', matchingId);
         console.log('aaaa');
         if (postId) {
-            const commentCollection = collection(UserCollection, 'Comments');
-            const commentQuerySnapshot = await getDocs(query(commentCollection, where('postId', '==', matchingId)));
+            const commentCollection = collection(UserCollection, 'Join');
+            const commentQuerySnapshot = await getDocs(query(commentCollection, where('matchingId', '==', matchingId)));
             if (commentQuerySnapshot.empty) {
-                await addDoc(commentCollection, { postId: postId });
+                await addDoc(commentCollection, { matchingId: postId });
                 console.log('참여 성공');
             } else {
                 console.log('이미 참여 기록이 존재합니다.');
@@ -232,12 +230,12 @@ export const addComment = async (userEmail, matchingId) => {
 
 export const deleteComment = async (userEmail, postId) => {
     try {
-        const userId = await findDocumentIdByField(collection(db, 'Users'), 'userId', userEmail);
-        const userDocRef = doc(db, 'Users', userId);
-        const collectionInput = collection(userDocRef, 'Comments'); 
-        const commentDocId = await findDocumentIdByField(collectionInput, 'postId', postId);
+        const userId = await findDocumentIdByField(collection(db, 'User'), 'userEmail', userEmail);
+        const userDocRef = doc(db, 'User', userId);
+        const collectionInput = collection(userDocRef, 'Join'); 
+        const commentDocId = await findDocumentIdByField(collectionInput, 'matchingId', postId);
         if (commentDocId) {
-            const commentDocRef = doc(db, 'Users', userId, 'Comments', commentDocId); 
+            const commentDocRef = doc(db, 'User', userId, 'Join', commentDocId); 
             await deleteDoc(commentDocRef); // 댓글 삭제
             console.log('댓글이 성공적으로 삭제되었습니다.');
         } else {

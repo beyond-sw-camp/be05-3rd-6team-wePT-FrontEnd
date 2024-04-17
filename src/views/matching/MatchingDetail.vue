@@ -54,6 +54,7 @@
 
 import { ref , onMounted} from 'vue'
 import { postDetail, addComment, deleteComment } from '@/stores/firestore.js'
+import { useAuthStore } from '@/stores/auth.js'
 // import { contains } from 'bootstrap-vue-3/dist/utils';
 
 
@@ -99,13 +100,16 @@ const getMatchingDetail = async (postId) => {
 }
 
 const userEmail = findUserEmail();
+// const userEmail = '9ou5oo@gmail.com';
 
-const applyMatching = async (userEmail, postId) => {
+console.log(userEmail);
+
+const applyMatching = async () => {
     console.log('userEmail in detail', userEmail);
     await addComment(userEmail, postId);
 }
 
-const cancelMatching = async (userEmail, postId) => {
+const cancelMatching = async () => {
     await deleteComment(userEmail, postId);
 }
 
