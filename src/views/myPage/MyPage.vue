@@ -9,39 +9,36 @@
             </div>
         </div>
         <ul class='nav' :class="{'nav-open': menuOpen }">
-            <li class='nav-item' :class="{ active: activeTab === 'created-matching' }"
-                @click="setActiveTab('created-matching')">
+            <li class='nav-item' :class="{ active: activeTab === 'createdMatch' }"
+                @click="setActiveTab('createdMatch')">
                 생성한 매칭
             </li>
-            <li class='nav-item' :class="{ active: activeTab === 'participated-matching' }"
-                @click="setActiveTab('participated-matching')">
+            <li class='nav-item' :class="{ active: activeTab === 'joinedMatch' }"
+                @click="setActiveTab('joinedMatch')">
                 참여한 매칭
             </li>
         </ul>
 
         <div class='card-container-wrapper'>
-            <div class='card-container' :class="{'show': activeTab === 'created-matching'}">
-                <b-card v-for='item in created_matching_data' :key='item.index'
-                        :title='item.category'
+            <div class='card-container' :class="{'show': activeTab === 'createdMatch'}">
+                <b-card v-for='create in createMatchingData' :key='create.index'
+                        :title='create.category'
                         class='mb-4 main-card'>
-                    <!-- <p class='card-text'>모집 중: {{ item.on_recruiting ? '예' : '아니오' }}</p>
-                    <p class='card-text'>참여 인원 / 인원 제한: ( {{ item.applied }} / {{ item.head_count_limit }} )</p>
-                    <p class='card-text'>생성일시: {{ item.created_at }}</p>
-                    <p class='card-text'>수정일시: {{ item.revised_at }}</p> -->
-                    <p class='card-text'>모집 중: {{ item.matchingAccomplishedYn ? '예' : '아니오' }}</p>
-                    <p class='card-text'>참여 인원 / 인원 제한: ( {{ item.matchingStatusHeads }} / {{ item.matchingHeadCountLimi }} )</p>
-                    <p class='card-text'>생성일시: {{ item.matchingCreatedAt }}</p>
-                    <p class='card-text'>수정일시: {{ item.matchingUpdatedAt }}</p>
+                    <p class='card-text'>모집 여부: {{ create.matchingDoneYN ? '진행 중' : '모집 완료' }}</p>
+                    <p class='card-text'>참여 인원 / 인원 제한: ( {{ create.matchingStatusHeads }} /
+                        {{ create.matchingHeadCountLimit }} )</p>
+                    <p class='card-text'>생성 일시: {{ create.matchingCreatedAt }}</p>
+                    <p class='card-text'>수정 일시: {{ create.matchingUpdateAt }}</p>
                 </b-card>
             </div>
 
-            <div class='card-container' :class="{'show': activeTab === 'participated-matching'}">
-                <b-card v-for='item in participated_matching_data' :key='item.id'
-                        :title='item.category'
+            <div class='card-container' :class="{'show': activeTab === 'joinedMatch'}">
+                <b-card v-for='join in joinedMatchingData' :key='join.id'
+                        :title='join.category'
                         class='mb-4 main-card'>
-                    <p class='card-text'>모집 중: {{ item.on_recruiting ? '예' : '아니오' }}</p>
-                    <p class='card-text'>참여 인원 / 인원 제한: ( {{ item.applied }} / {{ item.head_count_limit }} )</p>
-                    <p class='card-text'>참여 여부: {{ item.participated_completed ? '완료' : '진행 중' }}</p>
+                    <p class='card-text'>모집 여부: {{ join.on_recruiting ? '진행 중' : '모집 완료' }}</p>
+                    <p class='card-text'>참여 인원 / 인원 제한: ( {{ item.applied }} / {{ join.head_count_limit }} )</p>
+                    <p class='card-text'>참여 여부: {{ join.participated_completed ? '완료' : '진행 중' }}</p>
                 </b-card>
             </div>
             <div style='height: 20px' />
@@ -51,29 +48,49 @@
 <script setup>
 import { onMounted, onUnmounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { FindMyPost, FindMyComments } from '@/stores/firestore.js'
+
+//store
 import { useAuthStore } from '@/stores/auth.js'
+import { FindMyComments, FindMyMatching } from '@/stores/firestore.js'
+
 
 const router = useRouter()
-const created_matching_data = ref([])
-const participated_matching_data = ref([])
+// data ref
+const createMatchingData = ref([])
+const joinedMatchingData = ref([])
 
 // hamburger 관련 ref
 const menuOpen = ref(false)
-const activeTab = ref('created-matching')
+const activeTab = ref('createdMatch')
 
 // style
 const dynamicHeight = ref('')
 
 onMounted(() => {
-    getCreatedMatchingData()
-    getParticipateMatchingData()
+    getCreateMatchingData()
+    getJoinMatchingData()
 })
 
 onUnmounted(() => {
     window.removeEventListener('resize', calculateHeight)
 })
 
+const getCreateMatchingData = async () => {
+    const userEmail = await useAuthStore().user?.email
+    createMatchingData.value = await FindMyMatching(userEmail)
+
+    console.log(createMatchingData)
+}
+
+const getJoinMatchingData = async () => {
+    const userEmail = await useAuthStore().user?.email
+    console.log(userEmail)
+
+    joinedMatchingData.value = await FindMyComments(userEmail)
+    console.log(joinedMatchingData)
+}
+
+/* style 관련 function */
 const calculateHeight = () => {
     const subHeaderHeight = document.querySelector('.sub-header').offsetHeight
     const availableHeight = window.innerHeight - subHeaderHeight
@@ -87,48 +104,6 @@ const setActiveTab = (tab) => {
 }
 const toggleMenu = () => {
     menuOpen.value = !menuOpen.value
-}
-
-// created-matching (post)
-// const getCreatedMatchingData = () => {
-//     fetch('http://localhost:3000/created-matching')
-//         .then(response => response.json())
-//         .then(data => {
-//             console.log(data)
-//             created_matching_data.value = data
-//         })
-//         .catch(error => {
-//             console.error('Error fetching data:', error)
-//         })
-// }
-
-const getCreatedMatchingData = async () => {
-    const userEmail = await useAuthStore().user.email;
-    const FindPost = await FindMyPost(userEmail);
-    created_matching_data.value = FindPost;
-    console.log(created_matching_data);
-}
-
-
-// participated-matching (comments)
-// const getParticipateMatchingData = () => {
-//     fetch('http://localhost:3000/participated-matching')
-//         .then(response => response.json())
-//         .then(data => {
-//             // console.log(data)
-//             participated_matching_data.value = data
-//         })
-//         .catch(error => {
-//             console.error('Error fetching data:', error)
-//         })
-// }
-const getParticipateMatchingData = async () => {
-    // const userEmail = '9ou5oo@gmail.com';
-    const userEmail = await useAuthStore().user.email; //??
-    console.log(userEmail);
-    const FindComments = await FindMyComments(userEmail);
-    participated_matching_data.value = FindComments;
-    console.log(participated_matching_data);
 }
 </script>
 
