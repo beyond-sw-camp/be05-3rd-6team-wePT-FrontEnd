@@ -21,24 +21,24 @@
 
         <div class='card-container-wrapper'>
             <div class='card-container' :class="{'show': activeTab === 'createdMatch'}">
-                <b-card v-for='create in createMatchingData' :key='create.index'
-                        :title='create.category'
+                <b-card v-for='create in createMatchingWithCategory' :key='create.index'
+                        :title='create.categoryName'
                         class='mb-4 main-card'>
-                    <p class='card-text'>모집 여부: {{ create.matchingDoneYN ? '진행 중' : '모집 완료' }}</p>
-                    <p class='card-text'>참여 인원 / 인원 제한: ( {{ create.matchingStatusHeads }} /
-                        {{ create.matchingHeadCountLimit }} )</p>
+                    <p class='card-text'>모집 여부: {{ create.matchingDoneYn ? '모집 완료' : '진행 중' }}</p>
+                    <p class='card-text'>참여 인원 / 인원 제한: ( {{ create.matchingCurrentHead }} /
+                        {{ create.matchingLimitHead }} )</p>
                     <p class='card-text'>생성 일시: {{ create.matchingCreatedAt }}</p>
                     <p class='card-text'>수정 일시: {{ create.matchingUpdateAt }}</p>
                 </b-card>
             </div>
 
             <div class='card-container' :class="{'show': activeTab === 'joinedMatch'}">
-                <b-card v-for='join in joinedMatchingData' :key='join.id'
-                        :title='join.category'
+                <b-card v-for='join in joinedMatchingWithCategory' :key='join.id'
+                        :title='join.categoryName'
                         class='mb-4 main-card'>
-                    <p class='card-text'>모집 여부: {{ join.on_recruiting ? '진행 중' : '모집 완료' }}</p>
-                    <p class='card-text'>참여 인원 / 인원 제한: ( {{ item.applied }} / {{ join.head_count_limit }} )</p>
-                    <p class='card-text'>참여 여부: {{ join.participated_completed ? '완료' : '진행 중' }}</p>
+                    <p class='card-text'>모집 여부: {{ join.matchingDoneYn ? '진행 중' : '모집 완료' }}</p>
+                    <p class='card-text'>참여 인원 / 인원 제한: ( {{ join.matchingCurrentHead }} / {{ join.matchingLimitHead }}
+                        )</p>
                 </b-card>
             </div>
             <div style='height: 20px' />
@@ -46,49 +46,53 @@
     </section>
 </template>
 <script setup>
-import { onMounted, onUnmounted, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
 //store
 import { useAuthStore } from '@/stores/auth.js'
-import { FindMyComments, FindMyMatching } from '@/stores/firestore.js'
+import { FindMyJoinMatchingId, FindMyMatching } from '@/stores/firestore.js'
 
+// const
+import { categoryMap } from '@/lib/const.js'
 
 const router = useRouter()
 // data ref
 const createMatchingData = ref([])
 const joinedMatchingData = ref([])
 
-// hamburger 관련 ref
+// style ref
 const menuOpen = ref(false)
 const activeTab = ref('createdMatch')
-
-// style
 const dynamicHeight = ref('')
 
-onMounted(() => {
-    getCreateMatchingData()
-    getJoinMatchingData()
+onMounted(async () => {
+    const userEmail = useAuthStore().user?.email
+    if (userEmail) {
+        createMatchingData.value = await FindMyMatching(userEmail)
+        joinedMatchingData.value = await FindMyJoinMatchingId(userEmail)
+    }
 })
 
 onUnmounted(() => {
     window.removeEventListener('resize', calculateHeight)
 })
 
-const getCreateMatchingData = async () => {
-    const userEmail = await useAuthStore().user?.email
-    createMatchingData.value = await FindMyMatching(userEmail)
+const createMatchingWithCategory = computed(() => {
+    return createMatchingData.value.map(data => ({
+        ...data,
+        categoryName: categoryMap[data.matchingCategory] || 'Unknown',
+    }))
+})
 
-    console.log(createMatchingData)
-}
-
-const getJoinMatchingData = async () => {
-    const userEmail = await useAuthStore().user?.email
-    console.log(userEmail)
-
-    joinedMatchingData.value = await FindMyComments(userEmail)
-    console.log(joinedMatchingData)
-}
+const joinedMatchingWithCategory = computed(() => {
+    console.log(':::::: Mypage joinMatchingData ::::::::: ', joinedMatchingData.value)
+    // TODO: joinedMatchinData에 관한 값 들고 오기
+    return joinedMatchingData.value.map(data => ({
+        ...data,
+        categoryName: categoryMap[data.matchingCategory] || 'Unknown',
+    }))
+})
 
 /* style 관련 function */
 const calculateHeight = () => {
