@@ -11,7 +11,8 @@ export const useAuthStore = defineStore('auth', {
         initAuth() {
             onAuthStateChanged(auth, user => {
                 this.user = user
-                if (!user && router) {
+                const isSignUp = router.currentRoute.value.fullPath.startsWith('/sign-up')
+                if (!user && !isSignUp) {
                     router.push('/')
                 }
             })
