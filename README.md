@@ -50,6 +50,8 @@
     - 내가 생성한 매칭 : 카테고리, 모집 중 여부, 참여인원, 인원제한, 생성일시, 수정일시
     - 내가 참여한 매칭 : 카테고리, 모집 중 여부, 참여인원, 인원제한, 참여 여부
 
+<br/>
+
 ## 🎁 화면설계서 & 스토리보드
 
 [스토리보드 링크(figma) 바로가기 >](https://www.figma.com/file/rhvePbbEdi8seHKtJbrdF7/Figma-for-PPT?type=design&node-id=0%3A1&mode=design&t=MwGBstnq9lftkVQZ-1)
@@ -67,6 +69,9 @@
 - BACK-END: firebase
 - BUNDLER: vite
 - FOMATTER : prettier , eslint
+
+<br/>
+<img src="https://github.com/OrangeVinyl/wePT-front/assets/105047091/f70eaa0c-33cf-42cf-abb3-318ad8a3d8f2).png">
 
 <br/>
 
