@@ -46,6 +46,7 @@ const changeRouter = (id) => {
 const matchingCategory = FindmatchingCategory();
 const getMatchingBorad = async (matchingCategory) => {
     const matchingList = await FindPosts(matchingCategory);
+    console.log(matchingList);
     matching.value = matchingList;
 }
 

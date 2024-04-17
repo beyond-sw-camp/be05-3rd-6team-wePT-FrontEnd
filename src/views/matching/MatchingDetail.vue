@@ -54,19 +54,12 @@
 </template>
 <script setup>
 
-import { ref , onMounted} from 'vue'
+import { ref , onMounted, watch} from 'vue'
 import { postDetail, addComment, deleteComment, getUserNicknamesByMatchingId } from '@/stores/firestore.js'
 import { useAuthStore } from '@/stores/auth.js'
 
 const props = defineProps({
-    id: Number,
-    matchingId: Number,
-    matchingTitle: String,
-    matchingCreatedAt: Number,
-    matchingCategory: String,
-    matchingCurrentHead: Number,
-    matchingLimitHead: Number,
-    matchingContent: String,
+    id : Number
 })
 
 
@@ -86,7 +79,7 @@ const joinNickname = ref([]);
 
 
 const findUserEmail = async () => {
-    return await useAuthStore().user.email;
+    return await useAuthStore().user.email; // 로그인 한 사람
 }
 
 const postId = Number(props.id);
@@ -105,7 +98,7 @@ const getMatchingDetail = async (postId) => {
 }
 
 const applyMatching = async () => {
-    const userEmail = await findUserEmail(); // Wait for the promise to be fulfilled and get the result
+    const userEmail = await findUserEmail(); //지금 사용자 말고, 글 작성자의 email 필요
     await addComment(userEmail, postId);
 }
 
@@ -114,8 +107,17 @@ const cancelMatching = async () => {
     await deleteComment(userEmail, postId);
 }
 
-getUserNickname(postId);
 getMatchingDetail(postId);
+getUserNickname(postId);
+
+// watch(ret, () => {
+//     getUserNickname(postId)
+// })
+
+// watch(ret, () => {
+//     getMatchingDetail(postId)
+// })
+
 </script>
 <style scoped>
 .sub-title {

@@ -18,9 +18,9 @@
                         <br>
                         <label for='category'>카테고리 선택</label>
                         <select id='category' v-model='categoryDropdown' class='form-control'>
-                            <option value='delivery'>배달</option>
-                            <option value='buy'>공동구매</option>
-                            <option value='meeting'>모임</option>
+                            <option value=1>배달</option>
+                            <option value=2>공동구매</option>
+                            <option value=3>모임</option>
                         </select>
                     </div>
                     <div class='form-group'>
@@ -86,13 +86,15 @@ const findUserId = async () => {
 const save =  async () => {
     await findUserId();
     const newData = {
-        id: new Date().getTime(),
-        title: title.value,
-        date: date.value,
-        category: categoryDropdown.value,
-        limit_number: numberDropdown.value,
-        status_number: 0,
-        content: content.value,
+        matchingId: new Date().getTime(),
+        matchingTitle: title.value,
+        matchingEndDate: date.value,
+        matchingCategory: Number(categoryDropdown.value),
+        matchingLimitHead: numberDropdown.value,
+        matchingCurrentHead: 1,
+        matchingContent: content.value,
+        matchingCreateAt: new Date().toISOString().substr(0, 10),
+        matchingDoneYn : false
     }
 
     const addMatching = async (userId, newData) => {
