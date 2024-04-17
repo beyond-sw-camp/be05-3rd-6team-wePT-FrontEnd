@@ -27,8 +27,8 @@
                     <p class='card-text'>모집 여부: {{ create.matchingDoneYn ? '모집 완료' : '진행 중' }}</p>
                     <p class='card-text'>참여 인원 / 인원 제한: ( {{ create.matchingCurrentHead }} /
                         {{ create.matchingLimitHead }} )</p>
-                    <p class='card-text'>생성 일시: {{ create.matchingCreatedAt }}</p>
-                    <p class='card-text'>수정 일시: {{ create.matchingUpdateAt }}</p>
+                    <p class='card-text'>생성 일시: {{ create.matchingCreateAt }}</p>
+                    <p class='card-text'>수정 일시: {{ create.matchingUpdateAt ?? '-' }}</p>
                 </b-card>
             </div>
 
