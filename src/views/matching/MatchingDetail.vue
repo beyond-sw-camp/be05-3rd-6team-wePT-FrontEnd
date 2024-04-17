@@ -13,7 +13,7 @@
                 </div>
                 <div class='row mb-2'>
                     <div class='col-md-3 col-6 font-weight-bold'>작성일:</div>
-                    <div class='col-md-9 col-6'>{{ ret.matchingCreatedAt }}</div>
+                    <div class='col-md-9 col-6'>{{ ret.matchingCreateAt }}</div>
                 </div>
                 <div class='row mb-2'>
                     <div class='col-md-3 col-6 font-weight-bold'>주최자 ID:</div>
@@ -21,7 +21,7 @@
                 </div>
                 <div class='row'>
                     <div class='col-md-3 col-6 font-weight-bold'>인원 수:</div>
-                    <div class='col-md-9 col-6'>{{ ret.matchingStatusHeads }} / {{ ret.matchingHeadCountLimit }}</div>
+                    <div class='col-md-9 col-6'>{{ ret.matchingCurrentHead }} / {{ ret.matchingLimitHead }}</div>
                 </div>
             </div>
         </div>
@@ -62,10 +62,10 @@ const props = defineProps({
     id: Number,
     matchingId: Number,
     matchingTitle: String,
-    matchingCreatedAt: Date,
+    matchingCreatedAt: Number,
     matchingCategory: String,
-    matchingHeadCountLimit: Number,
-    matchingStatusHeads: Number,
+    matchingCurrentHead: Number,
+    matchingLimitHead: Number,
     matchingContent: String,
 })
 
@@ -114,8 +114,8 @@ const cancelMatching = async () => {
     await deleteComment(userEmail, postId);
 }
 
-getMatchingDetail(postId);
 getUserNickname(postId);
+getMatchingDetail(postId);
 </script>
 <style scoped>
 .sub-title {
