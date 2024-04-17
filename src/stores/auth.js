@@ -24,7 +24,6 @@ export const useAuthStore = defineStore('auth', {
             } catch (error) {
                 console.log('Logout Failed: ', error)
             }
-
-        },
+        }
     },
 })
