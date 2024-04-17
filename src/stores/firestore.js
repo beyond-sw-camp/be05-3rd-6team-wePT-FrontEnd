@@ -38,8 +38,12 @@ export const FindPosts = async (id) => {
 }
 
 
-// 세부 문서 출력 (매칭 신청한 id 까지)
-export const postDetail = async (matchingId) => {
+/**
+ * @description 매칭 상세 정보 반환
+ * @param matchingId
+ * @returns {Promise<*[]>}
+ */
+export const fetchMatchingDetail = async (matchingId) => {
     const UserCollection = collection(db, 'User')
     const post = []
     try {
@@ -49,7 +53,7 @@ export const postDetail = async (matchingId) => {
             const q = query(postCollection, where('matchingId', '==', matchingId))
             const querySnapshot = await getDocs(q)
             querySnapshot.forEach(pDoc => {
-                // console.log(pDoc.data());
+                console.log('=== fetchMatchingDetail ===', pDoc.data())
                 post.push(pDoc.data())
             })
         }))
@@ -64,7 +68,7 @@ export const postDetail = async (matchingId) => {
  * @param userId
  * @returns {Promise<*[]>}
  */
-export const FindMyMatching = async (userId) => {
+export const fetchMyMatchingList = async (userId) => {
     const UserCollection = collection(db, 'User')
     const userQuery = query(UserCollection, where('userEmail', '==', userId))
     const matchingList = []
@@ -77,7 +81,7 @@ export const FindMyMatching = async (userId) => {
             const querySnapshot = await getDocs(matchingCollection)
 
             querySnapshot.forEach(pDoc => {
-                console.log(pDoc.data())
+                console.log('=== fetchMyMatchingList === ', pDoc.data())
                 matchingList.push(pDoc.data())
             })
         }))
@@ -94,7 +98,7 @@ export const FindMyMatching = async (userId) => {
  * @returns {Promise<*[]>}
  * @constructor
  */
-export const FindMyJoinMatchingId = async (userId) => {
+export const fetchJoinIdList = async (userId) => {
     const UserCollection = collection(db, 'User')
     const userQuery = query(UserCollection, where('userEmail', '==', userId))
     const joinMatchingIdList = []
@@ -107,7 +111,7 @@ export const FindMyJoinMatchingId = async (userId) => {
             const querySnapshot = await getDocs(joinCollection)
 
             querySnapshot.forEach(pDoc => {
-                console.log(pDoc.data())
+                console.log('=== fetchJoinIdList === ', pDoc.data())
                 joinMatchingIdList.push(pDoc.data())
             })
         }))

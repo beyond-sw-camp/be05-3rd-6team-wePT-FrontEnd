@@ -21,9 +21,11 @@
 
         <div class='card-container-wrapper'>
             <div class='card-container' :class="{'show': activeTab === 'createdMatch'}">
-                <b-card v-for='create in createMatchingWithCategory' :key='create.index'
+                <b-card v-for='create in createMatchingWithCategory' :key='create.matchingId'
                         :title='create.categoryName'
-                        class='mb-4 main-card'>
+                        class='mb-4 main-card'
+                        @click='onHandleClick(create)'
+                >
                     <p class='card-text'>모집 여부: {{ create.matchingDoneYn ? '모집 완료' : '진행 중' }}</p>
                     <p class='card-text'>참여 인원 / 인원 제한: ( {{ create.matchingCurrentHead }} /
                         {{ create.matchingLimitHead }} )</p>
@@ -33,9 +35,10 @@
             </div>
 
             <div class='card-container' :class="{'show': activeTab === 'joinedMatch'}">
-                <b-card v-for='join in joinedMatchingWithCategory' :key='join.id'
+                <b-card v-for='join in joinedMatchingData' :key='join.matchingId'
                         :title='join.categoryName'
-                        class='mb-4 main-card'>
+                        class='mb-4 main-card'
+                        @click='onHandleClick(join)'>
                     <p class='card-text'>모집 여부: {{ join.matchingDoneYn ? '진행 중' : '모집 완료' }}</p>
                     <p class='card-text'>참여 인원 / 인원 제한: ( {{ join.matchingCurrentHead }} / {{ join.matchingLimitHead }}
                         )</p>
@@ -51,7 +54,7 @@ import { useRouter } from 'vue-router'
 
 //store
 import { useAuthStore } from '@/stores/auth.js'
-import { FindMyJoinMatchingId, FindMyMatching } from '@/stores/firestore.js'
+import { fetchJoinIdList, fetchMatchingDetail, fetchMyMatchingList } from '@/stores/firestore.js'
 
 // const
 import { categoryMap } from '@/lib/const.js'
@@ -69,14 +72,29 @@ const dynamicHeight = ref('')
 onMounted(async () => {
     const userEmail = useAuthStore().user?.email
     if (userEmail) {
-        createMatchingData.value = await FindMyMatching(userEmail)
-        joinedMatchingData.value = await FindMyJoinMatchingId(userEmail)
+        createMatchingData.value = await fetchMyMatchingList(userEmail)
+        await loadJoinedMatching(userEmail)
     }
 })
 
 onUnmounted(() => {
     window.removeEventListener('resize', calculateHeight)
 })
+
+const loadJoinedMatching = async (userEmail) => {
+    const joinIdList = await fetchJoinIdList(userEmail)
+    const matchingDetailsPromises = joinIdList.map((item) => {
+        return fetchMatchingDetail(item.matchingId)
+    })
+    const matchingDetails = (await Promise.all(matchingDetailsPromises)).flat()
+
+    joinedMatchingData.value = matchingDetails.map((detail) => ({
+        ...detail,
+        categoryName: categoryMap[detail.matchingCategory] || 'Unknown',
+    }))
+
+    console.log('=== Mypage joinedMatchingData ===', joinedMatchingData.value)
+}
 
 const createMatchingWithCategory = computed(() => {
     return createMatchingData.value.map(data => ({
@@ -85,14 +103,12 @@ const createMatchingWithCategory = computed(() => {
     }))
 })
 
-const joinedMatchingWithCategory = computed(() => {
-    console.log(':::::: Mypage joinMatchingData ::::::::: ', joinedMatchingData.value)
-    // TODO: joinedMatchinData에 관한 값 들고 오기
-    return joinedMatchingData.value.map(data => ({
-        ...data,
-        categoryName: categoryMap[data.matchingCategory] || 'Unknown',
-    }))
-})
+const onHandleClick = (matching) => {
+    const routeName = matching.matchingDoneYn ? 'detail' : 'update'
+    const routePath = `/matching/${routeName}/${matching.matchingId}`
+
+    router.push(routePath)
+}
 
 /* style 관련 function */
 const calculateHeight = () => {
