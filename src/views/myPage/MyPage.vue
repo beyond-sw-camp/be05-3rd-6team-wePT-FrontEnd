@@ -103,7 +103,7 @@ const toggleMenu = () => {
 // }
 
 const getCreatedMatchingData = async () => {
-    const userEmail = '9ou5oo@gmail.com';
+    const userEmail = await useAuthStore().user.email;
     const FindPost = await FindMyPost(userEmail);
     created_matching_data.value = FindPost;
     console.log(created_matching_data);
@@ -123,9 +123,9 @@ const getCreatedMatchingData = async () => {
 //         })
 // }
 const getParticipateMatchingData = async () => {
-    const userEmail = '9ou5oo@gmail.com';
-    // const userEmail = await useAuthStore(); //??
-    consol.log(userEmail);
+    // const userEmail = '9ou5oo@gmail.com';
+    const userEmail = await useAuthStore().user.email; //??
+    console.log(userEmail);
     const FindComments = await FindMyComments(userEmail);
     participated_matching_data.value = FindComments;
     console.log(participated_matching_data);

@@ -66,6 +66,8 @@
 import axios from 'axios'
 import { useRouter } from 'vue-router'
 import { inject, ref } from 'vue'
+import { addPost } from '@/stores/firestore.js'
+import { useAuthStore } from '@/stores/auth.js'
 
 const router = useRouter()
 const modalHandler = inject('modalHandler')
@@ -76,11 +78,16 @@ const date = ref(new Date().toISOString().substr(0, 10))
 const categoryDropdown = ref('delivery')
 const numberDropdown = ref('1')
 const content = ref('')
+let userId
+const findUserId = async () => {
+    userId = await useAuthStore().user.email;
+}
 
-const save = () => {
+const save =  async () => {
+    await findUserId();
     const newData = {
         id: new Date().getTime(),
-        title: title.value, // ref로 생성한 상태에는 .value로 접근합니다.
+        title: title.value,
         date: date.value,
         category: categoryDropdown.value,
         limit_number: numberDropdown.value,
@@ -88,22 +95,13 @@ const save = () => {
         content: content.value,
     }
 
-    axios.post('http://localhost:3000/insert', newData)
-        .then(response => {
-            modalHandler.openSuccess('데이터 저장 성공', '데이터가 성공적으로 저장되었습니다.')
-            console.log(response)
-            // 저장 후에 입력 필드를 비웁니다.
-            title.value = ''
-            date.value = new Date().toISOString().substr(0, 10)
-            categoryDropdown.value = 'delivery'
-            numberDropdown.value = '1'
-            content.value = ''
-        })
-        .catch(error => {
-            console.error('Failed to save data:', error)
-            modalHandler.open('저장 실패', '데이터를 저장하는 데 실패했습니다.', false)
-        })
+    const addMatching = async (userId, newData) => {
+        await addPost(userId, newData);
+    }
+
+    await addMatching(userId, newData);
 }
+
 
 const cancel = () => {
     router.go(-1)

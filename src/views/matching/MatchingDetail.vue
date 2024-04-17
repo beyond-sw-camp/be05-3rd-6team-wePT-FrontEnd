@@ -5,23 +5,23 @@
             <div class='card-body'>
                 <div class='row mb-2'>
                     <div class='col-md-3 col-6 font-weight-bold'>카테고리:</div>
-                    <div class='col-md-9 col-6'>{{ params.category }}</div>
+                    <div class='col-md-9 col-6'>{{ ret.matchingCategory }}</div>
                 </div>
                 <div class='row mb-2'>
                     <div class='col-md-3 col-6 font-weight-bold'>제목:</div>
-                    <div class='col-md-9 col-6'>{{ params.title }}</div>
+                    <div class='col-md-9 col-6'>{{ ret.matchingTitle }}</div>
                 </div>
                 <div class='row mb-2'>
                     <div class='col-md-3 col-6 font-weight-bold'>작성일:</div>
-                    <div class='col-md-9 col-6'>{{ params.date }}</div>
+                    <div class='col-md-9 col-6'>{{ ret.matchingCreatedAt }}</div>
                 </div>
                 <div class='row mb-2'>
                     <div class='col-md-3 col-6 font-weight-bold'>주최자 ID:</div>
-                    <div class='col-md-9 col-6'>{{ params.id }}</div>
+                    <div class='col-md-9 col-6'>{{ ret.matchingId }}</div>
                 </div>
                 <div class='row'>
                     <div class='col-md-3 col-6 font-weight-bold'>인원 수:</div>
-                    <div class='col-md-9 col-6'>{{ params.status_number }} / {{ params.limit_number }}</div>
+                    <div class='col-md-9 col-6'>{{ ret.matchingStatusHeads }} / {{ ret.matchingHeadCountLimit }}</div>
                 </div>
             </div>
         </div>
@@ -31,7 +31,7 @@
                 게시글 내용
             </div>
             <div class='card-body'>
-                <p class='card-text'>{{ params.content }}</p>
+                <p class='card-text'>{{ ret.matchingContent }}</p>
             </div>
         </div>
 
@@ -45,39 +45,71 @@
         </div>
 
         <div class='text-center my-4 button-wrapper '>
-            <button type='button' class='btn btn-success mr-2'>참가 신청</button>
-            <button type='button' class='btn btn-danger'>참가 취소</button>
+            <button type='button' class='btn btn-success mr-2' @click="applyMatching">참가 신청</button>
+            <button type='button' class='btn btn-danger' @click="cancelMatching">참가 취소</button>
         </div>
     </section>
 </template>
 <script setup>
 
-import { ref } from 'vue'
+import { ref , onMounted} from 'vue'
+import { postDetail, addComment, deleteComment } from '@/stores/firestore.js'
+// import { contains } from 'bootstrap-vue-3/dist/utils';
+
 
 const props = defineProps({
     id: Number,
-    title: String,
-    date: String,
-    category: String,
-    limit_number: Number,
-    status_number: Number,
-    content: String,
+    matchingId: Number,
+    matchingTitle: String,
+    matchingCreatedAt: Date,
+    matchingCategory: String,
+    matchingHeadCountLimit: Number,
+    matchingStatusHeads: Number,
+    matchingContent: String,
 })
+
 
 // 사용 예시 - 가데이터 사용을 위해 기본값 설정
-const params = ref({
-    'id': props.id || 134342,
-    'title': props.title || 'title1',
-    'date': props.date || '2024-04-15',
-    'category': props.category || 'delivery',
-    'limit_number': props.limit_number || 3,
-    'status_number': props.status_number || 1,
-    'content': props.content || 'content1dffffffsdfsdfsass',
-})
-
+// const params = ref({
+//     'id': props.id || 134342,
+//     'title': props.title || 'title1',
+//     'date': props.date || '2024-04-15',
+//     'category': props.category || 'delivery',props.matchingCategory || 
+//     'limit_number': props.limit_number || 3,
+//     'status_number': props.status_number || 1,
+//     'content': props.content || 'content1dffffffsdfsdfsass',
+// })
+const params = ref({})
+const ret = ref({});
+    
 const secondParam = ref({
     'id': 234343,
 })
+
+const findUserEmail = async () => {
+    return await useAuthStore().user.email;
+}
+const postId = Number(props.id);
+
+const getMatchingDetail = async (postId) => {
+    const matcingDetail = await postDetail(postId);
+    params.value = matcingDetail;
+    console.log(params.value);
+    ret.value = params.value[0];
+}
+
+const userEmail = findUserEmail();
+
+const applyMatching = async (userEmail, postId) => {
+    console.log('userEmail in detail', userEmail);
+    await addComment(userEmail, postId);
+}
+
+const cancelMatching = async (userEmail, postId) => {
+    await deleteComment(userEmail, postId);
+}
+
+getMatchingDetail(postId);
 
 </script>
 <style scoped>

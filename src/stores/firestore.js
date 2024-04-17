@@ -49,7 +49,7 @@ export const postDetail = async (matchingId) => {
             const q = query(postCollection, where('matchingId', '==', matchingId));
             const querySnapshot = await getDocs(q);
             querySnapshot.forEach(pDoc => {
-                console.log(pDoc.data());
+                // console.log(pDoc.data());
                 post.push(pDoc.data());
             });
         }));
@@ -199,5 +199,51 @@ export const findDocumentIdByField = async (collectionInput, field, value) => {
     } catch (error) {
         console.error('문서 ID를 찾는 중 오류 발생:', error);
         return null;
+    }
+};
+
+export const addComment = async (userEmail, matchingId) => {
+    try {
+        console.log('userEmail', userEmail);
+        const userId = await findDocumentIdByField(collection(db, 'Users'), 'userId', userEmail);
+        console.log(userId);
+        const userDocRef = doc(db, 'Users', userId);
+        console.log('aa');
+        const collectionInput = collection(userDocRef, 'Post');
+        const postId = await findDocumentIdByField(collectionInput, 'matchingId', matchingId);
+        console.log('aaaa');
+        if (postId) {
+            const commentCollection = collection(UserCollection, 'Comments');
+            const commentQuerySnapshot = await getDocs(query(commentCollection, where('postId', '==', matchingId)));
+            if (commentQuerySnapshot.empty) {
+                await addDoc(commentCollection, { postId: postId });
+                console.log('참여 성공');
+            } else {
+                console.log('이미 참여 기록이 존재합니다.');
+            }
+        } else {
+            console.error('해당 필드 값을 가진 문서를 찾을 수 없습니다.');
+        }
+    } catch (error) {
+        console.error('추가 중 오류 발생:', error);
+    }
+};
+
+
+export const deleteComment = async (userEmail, postId) => {
+    try {
+        const userId = await findDocumentIdByField(collection(db, 'Users'), 'userId', userEmail);
+        const userDocRef = doc(db, 'Users', userId);
+        const collectionInput = collection(userDocRef, 'Comments'); 
+        const commentDocId = await findDocumentIdByField(collectionInput, 'postId', postId);
+        if (commentDocId) {
+            const commentDocRef = doc(db, 'Users', userId, 'Comments', commentDocId); 
+            await deleteDoc(commentDocRef); // 댓글 삭제
+            console.log('댓글이 성공적으로 삭제되었습니다.');
+        } else {
+            console.error('해당 postId를 가진 댓글을 찾을 수 없습니다.');
+        }
+    } catch (error) {
+        console.error('댓글을 삭제하는 중 오류 발생:', error);
     }
 };
