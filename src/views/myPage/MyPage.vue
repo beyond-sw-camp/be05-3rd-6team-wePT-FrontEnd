@@ -24,10 +24,14 @@
                 <b-card v-for='item in created_matching_data' :key='item.index'
                         :title='item.category'
                         class='mb-4 main-card'>
-                    <p class='card-text'>모집 중: {{ item.on_recruiting ? '예' : '아니오' }}</p>
+                    <!-- <p class='card-text'>모집 중: {{ item.on_recruiting ? '예' : '아니오' }}</p>
                     <p class='card-text'>참여 인원 / 인원 제한: ( {{ item.applied }} / {{ item.head_count_limit }} )</p>
                     <p class='card-text'>생성일시: {{ item.created_at }}</p>
-                    <p class='card-text'>수정일시: {{ item.revised_at }}</p>
+                    <p class='card-text'>수정일시: {{ item.revised_at }}</p> -->
+                    <p class='card-text'>모집 중: {{ item.matchingAccomplishedYn ? '예' : '아니오' }}</p>
+                    <p class='card-text'>참여 인원 / 인원 제한: ( {{ item.matchingStatusHeads }} / {{ item.matchingHeadCountLimi }} )</p>
+                    <p class='card-text'>생성일시: {{ item.matchingCreatedAt }}</p>
+                    <p class='card-text'>수정일시: {{ item.matchingUpdatedAt }}</p>
                 </b-card>
             </div>
 
@@ -47,6 +51,8 @@
 <script setup>
 import { onMounted, onUnmounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { FindMyPost, FindMyComments } from '@/stores/firestore.js'
+import { useAuthStore } from '@/stores/auth.js'
 
 const router = useRouter()
 const created_matching_data = ref([])
@@ -83,30 +89,46 @@ const toggleMenu = () => {
     menuOpen.value = !menuOpen.value
 }
 
+// created-matching (post)
+// const getCreatedMatchingData = () => {
+//     fetch('http://localhost:3000/created-matching')
+//         .then(response => response.json())
+//         .then(data => {
+//             console.log(data)
+//             created_matching_data.value = data
+//         })
+//         .catch(error => {
+//             console.error('Error fetching data:', error)
+//         })
+// }
 
-const getCreatedMatchingData = () => {
-    fetch('http://localhost:3000/created-matching')
-        .then(response => response.json())
-        .then(data => {
-            console.log(data)
-            created_matching_data.value = data
-        })
-        .catch(error => {
-            console.error('Error fetching data:', error)
-        })
+const getCreatedMatchingData = async () => {
+    const userEmail = '9ou5oo@gmail.com';
+    const FindPost = await FindMyPost(userEmail);
+    created_matching_data.value = FindPost;
+    console.log(created_matching_data);
 }
 
 
-const getParticipateMatchingData = () => {
-    fetch('http://localhost:3000/participated-matching')
-        .then(response => response.json())
-        .then(data => {
-            console.log(data)
-            participated_matching_data.value = data
-        })
-        .catch(error => {
-            console.error('Error fetching data:', error)
-        })
+// participated-matching (comments)
+// const getParticipateMatchingData = () => {
+//     fetch('http://localhost:3000/participated-matching')
+//         .then(response => response.json())
+//         .then(data => {
+//             // console.log(data)
+//             participated_matching_data.value = data
+//         })
+//         .catch(error => {
+//             console.error('Error fetching data:', error)
+//         })
+// }
+const getParticipateMatchingData = async () => {
+    const userEmail = '9ou5oo@gmail.com';
+    // const userEmail = await useAuthStore(); //??
+    consol.log(userEmail);
+    const FindComments = await FindMyComments(userEmail);
+    participated_matching_data.value = FindComments;
+    console.log(participated_matching_data);
 }
 </script>
 

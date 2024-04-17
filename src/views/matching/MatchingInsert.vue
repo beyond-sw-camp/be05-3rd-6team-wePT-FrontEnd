@@ -20,8 +20,7 @@
                         <select id='category' v-model='categoryDropdown' class='form-control'>
                             <option value='delivery'>배달</option>
                             <option value='buy'>공동구매</option>
-                            <option value='meeting'>번개</option>
-                            <option value='etc'>기타</option>
+                            <option value='meeting'>모임</option>
                         </select>
                     </div>
                     <div class='form-group'>
