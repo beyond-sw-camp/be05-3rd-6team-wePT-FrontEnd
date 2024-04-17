@@ -59,6 +59,7 @@ import {
     updatePassword,
     updateProfile,
 } from 'firebase/auth'
+import { addUser } from '@/stores/firestore.js';
 
 
 const router = useRouter()
@@ -133,7 +134,11 @@ const onSubmit = async () => {
             displayName: params.value.nickname,
         })
 
-        modalHandler.open('가입 성공', '회원가입에 성공했습니다.', true, '로그인 하기', () => {
+        modalHandler.open('가입 성공', '회원가입에 성공했습니다.', true, '로그인 하기', async () => {
+            await addUser({
+                userEmail : params.value.email,
+                userNickname : params.value.nickname
+            });
             router.push('/login')
             modalHandler.close()
         })

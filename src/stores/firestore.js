@@ -1,6 +1,18 @@
 import { collection, getDocs, query, where, addDoc, updateDoc, doc, deleteDoc, increment } from 'firebase/firestore';
 import { db } from '@/firebase/index.js';
 
+// 회원가입 (사용자 추가)
+export const addUser = async (data) => {
+    const UserCollection = collection(db, 'User');
+
+    await addDoc(UserCollection, data).then(() => {
+        console.log('사용자 정보 추가.');
+    }).catch(error => {
+        console.error('사용자 정보 추가 중 오류  발생:', error);
+    });
+};
+
+
 // 사용자 (전체) 출력 
 export const fetchUsers = async () => {
     const UserCollection = collection(db, 'User');
@@ -181,7 +193,6 @@ export const deletePost = async (userEmail, matchingId) => {
         console.error('포스트를 삭제하는 중 오류 발생:', error);
     }
 };
-
 
 // 문서 아이ㅐ디 찾기
 export const findDocumentIdByField = async (collectionInput, field, value) => {
