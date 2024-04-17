@@ -2,7 +2,7 @@
     <section style='width: 100%'>
         <div class='intro-wrapper'>
             <div class='logo-wrapper'>
-                <Logo src='../../public/assets/wePT_logo.svg' altText='wePT-Logo' />
+                <Logo src='../../public/assets/wePT-logo.png' altText='wePT-Logo' />
             </div>
             <div class='two-button-wrapper'>
                 <b-button
