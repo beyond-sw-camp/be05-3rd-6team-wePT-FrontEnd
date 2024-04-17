@@ -40,7 +40,9 @@
                 참가 신청자 목록
             </div>
             <div class='card-body'>
-                <p class='card-text'>{{ secondParam.id }}</p>
+                <p class='card-text' v-for='param in joinNickname' :key='param'>
+                    {{ param }}
+                </p>
             </div>
         </div>
 
@@ -53,10 +55,8 @@
 <script setup>
 
 import { ref , onMounted} from 'vue'
-import { postDetail, addComment, deleteComment } from '@/stores/firestore.js'
+import { postDetail, addComment, deleteComment, getUserNicknamesByMatchingId } from '@/stores/firestore.js'
 import { useAuthStore } from '@/stores/auth.js'
-// import { contains } from 'bootstrap-vue-3/dist/utils';
-
 
 const props = defineProps({
     id: Number,
@@ -82,15 +82,20 @@ const props = defineProps({
 // })
 const params = ref({})
 const ret = ref({});
-    
-const secondParam = ref({
-    'id': 234343,
-})
+const joinNickname = ref([]);
+
 
 const findUserEmail = async () => {
     return await useAuthStore().user.email;
 }
+
 const postId = Number(props.id);
+
+const getUserNickname = async (postId) => {
+    const res = await getUserNicknamesByMatchingId(postId);
+    console.log('nickname', res);
+    joinNickname.value = res;
+}
 
 const getMatchingDetail = async (postId) => {
     const matcingDetail = await postDetail(postId);
@@ -99,22 +104,18 @@ const getMatchingDetail = async (postId) => {
     ret.value = params.value[0];
 }
 
-const userEmail = findUserEmail();
-// const userEmail = '9ou5oo@gmail.com';
-
-console.log(userEmail);
-
 const applyMatching = async () => {
-    console.log('userEmail in detail', userEmail);
+    const userEmail = await findUserEmail(); // Wait for the promise to be fulfilled and get the result
     await addComment(userEmail, postId);
 }
 
 const cancelMatching = async () => {
+    const userEmail = await findUserEmail();
     await deleteComment(userEmail, postId);
 }
 
 getMatchingDetail(postId);
-
+getUserNickname(postId);
 </script>
 <style scoped>
 .sub-title {

@@ -1,4 +1,4 @@
-import { collection, getDocs, query, where, addDoc, updateDoc, doc, deleteDoc } from 'firebase/firestore';
+import { collection, getDocs, query, where, addDoc, updateDoc, doc, deleteDoc, increment } from 'firebase/firestore';
 import { db } from '@/firebase/index.js';
 
 // 사용자 (전체) 출력 
@@ -206,19 +206,28 @@ export const addComment = async (userEmail, matchingId) => {
         const userId = await findDocumentIdByField(collection(db, 'User'), 'userEmail', userEmail);
         console.log(userId);
         const userDocRef = doc(db, 'User', userId);
-        console.log('aa');
         const collectionInput = collection(userDocRef, 'Matching');
         const postId = await findDocumentIdByField(collectionInput, 'matchingId', matchingId);
-        console.log('aaaa');
         if (postId) {
-            const commentCollection = collection(UserCollection, 'Join');
+            const commentCollection = collection(db, 'User', userId, 'Join'); 
             const commentQuerySnapshot = await getDocs(query(commentCollection, where('matchingId', '==', matchingId)));
             if (commentQuerySnapshot.empty) {
-                await addDoc(commentCollection, { matchingId: postId });
+                await addDoc(commentCollection, { matchingId: matchingId });
                 console.log('참여 성공');
             } else {
                 console.log('이미 참여 기록이 존재합니다.');
             }
+
+            const matchingDocRef = doc(db, `User/${userId}/Matching/${postId}`);
+
+            // 증가시킬 값
+            const incrementValue = 1;
+
+                // 문서 업데이트
+            await updateDoc(matchingDocRef, {
+                matchingCurrentHead: increment(incrementValue)
+            });
+
         } else {
             console.error('해당 필드 값을 가진 문서를 찾을 수 없습니다.');
         }
@@ -228,20 +237,60 @@ export const addComment = async (userEmail, matchingId) => {
 };
 
 
-export const deleteComment = async (userEmail, postId) => {
+export const deleteComment = async (userEmail, matchingId) => {
     try {
         const userId = await findDocumentIdByField(collection(db, 'User'), 'userEmail', userEmail);
         const userDocRef = doc(db, 'User', userId);
         const collectionInput = collection(userDocRef, 'Join'); 
-        const commentDocId = await findDocumentIdByField(collectionInput, 'matchingId', postId);
+        const commentDocId = await findDocumentIdByField(collectionInput, 'matchingId', matchingId);
+        const postId = await findDocumentIdByField( collection(userDocRef, 'Matching'), 'matchingId', matchingId);
         if (commentDocId) {
             const commentDocRef = doc(db, 'User', userId, 'Join', commentDocId); 
             await deleteDoc(commentDocRef); // 댓글 삭제
             console.log('댓글이 성공적으로 삭제되었습니다.');
+
+            const matchingDocRef = doc(db, `User/${userId}/Matching/${postId}`);
+
+            // 증가시킬 값
+            const decrementValue = -1;
+
+                // 문서 업데이트
+            await updateDoc(matchingDocRef, {
+                matchingCurrentHead: increment(decrementValue)
+            });
+
         } else {
             console.error('해당 postId를 가진 댓글을 찾을 수 없습니다.');
         }
     } catch (error) {
         console.error('댓글을 삭제하는 중 오류 발생:', error);
+    }
+};
+
+
+// 매칭한 닉네임 찾기
+export const getUserNicknamesByMatchingId = async (matchingId) => {
+    try {
+        const userCollectionRef = collection(db, 'User');
+        const userCollectionSnapshot = await getDocs(userCollectionRef);
+
+        const userNicknames = [];
+
+        for (const userDoc of userCollectionSnapshot.docs) {
+            const joinCollectionRef = collection(userDoc.ref, 'Join');
+            
+            const joinQuery = query(joinCollectionRef, where('matchingId', '==', matchingId));
+            const joinSnapshot = await getDocs(joinQuery);
+            
+            if (!joinSnapshot.empty) {
+                const userNickname = userDoc.data().userNickname;
+                userNicknames.push(userNickname);
+            }
+        }
+
+        return userNicknames;
+    } catch (error) {
+        console.error('사용자 닉네임을 가져오는 중 오류 발생:', error);
+        return [];
     }
 };
