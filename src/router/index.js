@@ -41,8 +41,21 @@ const router = createRouter({
         {
             path: '/main',
             name: 'Main',
-            component: () => import('@/views/Main.vue'),
-            meta: { requiresAuth: true },
+            component: () => import('@/views/main/Main.vue'),
+            meta: { layout: MainLayout, requiresAuth: true },
+        },
+        {
+            path: '/my-page',
+            name: 'MyPage',
+            component: () => import('@/views/myPage/MyPage.vue'),
+            meta: { layout: MainLayout, requiresAuth: true },
+        },
+        {
+            path: '/matching/:service',
+            name: 'Matching',
+            component: () => import('@/views/matching/Matching.vue'),
+            meta: { layout: MatchingLayout, requiresAuth: true },
+            props: true,
         },
         {
             path: '/matching/insert',
@@ -62,12 +75,6 @@ const router = createRouter({
             component: () => import('@/views/matching/MatchingDetail.vue'),
             meta: { layout: MatchingLayout, requiresAuth: true },
             props: true,
-        },
-        {
-            path: '/my-page',
-            name: 'MyPage',
-            component: () => import('@/views/myPage/MyPage.vue'),
-            meta: { layout: MainLayout, requiresAuth: true },
         },
     ],
 })

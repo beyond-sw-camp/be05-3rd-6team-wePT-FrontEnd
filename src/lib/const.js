@@ -9,3 +9,15 @@ export const authMessages = deepFreeze(
         MISSING_EMAIL: '이메일 주소를 입력해주세요.',
     },
 )
+
+export const matchingType = Object.freeze({
+    DELIVERY: 'delivery',
+    GROUP_BUYING: 'groupBuying',
+    GATHERING: 'gathering',
+    DELIVERY_KR: '배달',
+    GROUP_BUYING_KR: '공동구매',
+    GATHERING_KR: '모임',
+})
+
+
+

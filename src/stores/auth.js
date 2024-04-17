@@ -20,6 +20,7 @@ export const useAuthStore = defineStore('auth', {
             try {
                 await signOut(auth)
                 this.user = null // 사용자 상태 초기화
+                localStorage.clear()
                 router.push('/login') // 로그인 페이지로 리디렉션
             } catch (error) {
                 console.log('Logout Failed: ', error)

@@ -8,7 +8,6 @@
                 <div class='bar'></div>
             </div>
         </div>
-
         <ul class='nav' :class="{'nav-open': menuOpen }">
             <li class='nav-item' :class="{ active: activeTab === 'created-matching' }"
                 @click="setActiveTab('created-matching')">
