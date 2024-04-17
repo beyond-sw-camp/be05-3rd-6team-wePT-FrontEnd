@@ -4,25 +4,26 @@
             <a v-if='showBackButton' @click='goBack'>
                 <font-awesome-icon :icon='["fas", "chevron-left"]' style='color:black; font-size: 20px;' />
             </a>
-            <button v-if='showLogoutButton' @click='logout' class='logout-button'>
+            <button v-if='showLogoutButton' @click='onHandleModal' class='logout-button'>
                 로그아웃
             </button>
         </div>
     </nav>
 </template>
 <script setup>
-import { computed } from 'vue'
+import { computed, inject } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth.js'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
+
 const router = useRouter()
 const route = useRoute()
 const { logout } = useAuthStore()
+const modalHandler = inject('modalHandler')
 
 /* 로그아웃 버튼을 보여 줄 path*/
 const allowedPaths = ['/main', '/matching', '/my-page']
-
 
 const showBackButton = computed(() => {
     return route.path !== '/main'
@@ -31,6 +32,15 @@ const showBackButton = computed(() => {
 const showLogoutButton = computed(() => {
     return allowedPaths.some(path => route.path.includes(path))
 })
+
+const onHandleModal = () => {
+    modalHandler.open('로그아웃', '정말로 로그아웃 하시겠습니까?', true, '로그아웃', onLogout)
+}
+
+const onLogout = () => {
+    modalHandler.close()
+    logout()
+}
 
 const goBack = () => {
     router.go(-1)

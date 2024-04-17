@@ -11,7 +11,6 @@
     </div>
 </template>
 <script setup>
-import axios from 'axios'
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 
@@ -106,19 +105,6 @@ const matching = ref([
         },
     ],
 )
-
-const fetchData = async () => {
-    axios.get('http://localhost:3000')
-        .then(response => {
-            matching.value = response.data
-            console.log(matching.value)
-            console.log(matching.value[0].matchingTitle)
-        })
-        .catch(error => {
-            console.log('Failed to fetch matching:', error)
-        })
-}
-
 
 const changeRouter = (id) => {
     const matchingId = id
