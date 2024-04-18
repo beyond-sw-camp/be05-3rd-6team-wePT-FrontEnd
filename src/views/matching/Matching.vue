@@ -1,5 +1,5 @@
 <template>
-    <section>
+    <section style='width: 100%'>
         <div class='main-title'>{{ serviceName }} 서비스</div>
         <div class='button-wrapper'>
             <button class='post-button' @click='onWritePost'>게시글 작성</button>

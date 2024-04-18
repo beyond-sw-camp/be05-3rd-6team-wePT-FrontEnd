@@ -2,8 +2,8 @@
     <section style='width: 100%'>
         <div class='main-title'>매칭 생성</div>
         <div class='d-flex flex-row justify-content-end'>
-            <button class='btn btn-danger' @click='cancel'>취소</button>
-            <button class='btn btn-success' style='margin-left: 1rem' @click='save'>저장</button>
+            <button class='btn btn-danger' @click='moveBack'>취소</button>
+            <button class='btn btn-success' style='margin-left: 1rem' @click='onSave'>저장</button>
         </div>
 
 
@@ -18,10 +18,9 @@
                         <br>
                         <label for='category'>카테고리 선택</label>
                         <select id='category' v-model='categoryDropdown' class='form-control'>
-                            <option value='delivery'>배달</option>
-                            <option value='buy'>공동구매</option>
-                            <option value='meeting'>번개</option>
-                            <option value='etc'>기타</option>
+                            <option value='1'>배달</option>
+                            <option value='2'>공동구매</option>
+                            <option value='3'>모임</option>
                         </select>
                     </div>
                     <div class='form-group'>
@@ -64,9 +63,10 @@
 </template>
 
 <script setup>
-import axios from 'axios'
 import { useRouter } from 'vue-router'
-import { inject, ref } from 'vue'
+import { inject, onMounted, ref } from 'vue'
+import { fetchMatching } from '@/api/api.js'
+import { useAuthStore } from '@/stores/auth.js'
 
 const router = useRouter()
 const modalHandler = inject('modalHandler')
@@ -77,40 +77,59 @@ const date = ref(new Date().toISOString().substr(0, 10))
 const categoryDropdown = ref('delivery')
 const numberDropdown = ref('1')
 const content = ref('')
+const matchingOwnerName = ref('')
 
-const save = () => {
+
+onMounted(async () => {
+    matchingOwnerName.value = await getMatchingOwnerName()
+})
+
+const findUserId = async () => {
+    return await useAuthStore().user.email
+}
+
+const getMatchingOwnerName = async () => {
+    console.log('=== getMatchingOwnerName ===', typeof (useAuthStore().user.providerData[0].displayName))
+    return await useAuthStore().user.providerData[0].displayName
+}
+
+const onSave = async () => {
     const newData = {
-        id: new Date().getTime(),
-        title: title.value, // ref로 생성한 상태에는 .value로 접근합니다.
-        date: date.value,
-        category: categoryDropdown.value,
-        limit_number: numberDropdown.value,
-        status_number: 0,
-        content: content.value,
+        matchingId: new Date().getTime(),
+        matchingTitle: title.value,
+        matchingEndDate: date.value,
+        matchingCategory: Number(categoryDropdown.value),
+        matchingLimitHead: numberDropdown.value,
+        matchingCurrentHead: 1,
+        matchingContent: content.value,
+        matchingCreateAt: new Date().toISOString().substr(0, 10),
+        matchingDoneYn: false,
+        matchingOwnerName: matchingOwnerName.value,
     }
 
-    axios.post('http://localhost:3000/insert', newData)
-        .then(response => {
-            modalHandler.openSuccess('데이터 저장 성공', '데이터가 성공적으로 저장되었습니다.')
-            console.log(response)
-            // 저장 후에 입력 필드를 비웁니다.
-            title.value = ''
-            date.value = new Date().toISOString().substr(0, 10)
-            categoryDropdown.value = 'delivery'
-            numberDropdown.value = '1'
-            content.value = ''
-        })
-        .catch(error => {
-            console.error('Failed to save data:', error)
-            modalHandler.open('저장 실패', '데이터를 저장하는 데 실패했습니다.', false)
-        })
+    try {
+        const userId = await findUserId()
+        await addMatching(userId, newData)
+
+        modalHandler.open('매칭이 생성되었습니다.', '확인', true, '목록으로', onHandleClick)
+    } catch (error) {
+        console.error('error', error)
+    }
+
 }
 
-const cancel = () => {
+const onHandleClick = () => {
+    modalHandler.close()
+    moveBack()
+}
+
+const addMatching = async (userId, newData) => {
+    await fetchMatching(userId, newData)
+}
+
+const moveBack = () => {
     router.go(-1)
 }
-
-
 </script>
 <style>
 /* scoped 속성을 사용하여 컴포넌트 스타일링 */

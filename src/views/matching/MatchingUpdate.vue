@@ -2,9 +2,9 @@
     <div style='width: 100%'>
         <div class='main-title'>매칭 수정</div>
         <div class='d-flex flex-row justify-content-end'>
-            <button class='btn btn-danger' @click='cancel'>취소</button>
-            <button class='btn btn-danger' style='margin-left: 1rem' @click='deleteMatching'>매칭 삭제</button>
-            <button class='btn btn-success' style='margin-left: 1rem' @click='save'>저장</button>
+            <button class='btn btn-danger' @click='goBack'>취소</button>
+            <button class='btn btn-danger' style='margin-left: 1rem' @click='onHandleClick'>매칭 삭제</button>
+            <button class='btn btn-success' style='margin-left: 1rem' @click='onUpdate'>저장</button>
         </div>
 
         <div class='mt-2'>
@@ -12,27 +12,27 @@
                 <div>
                     <div class='form-group'>
                         <label for='title'>제목</label>
-                        <input type='text' id='title' v-model='title' class='form-control' placeholder='제목을 입력하세요.'>
+                        <input type='text' id='title' v-model='params.matchingTitle' class='form-control'
+                               placeholder='제목을 입력하세요.'>
                     </div>
                     <div class='form-group'>
                         <br>
                         <label for='category'>카테고리 선택</label>
-                        <select id='category' v-model='categoryDropdown' class='form-control'>
-                            <option value='delivery'>배달</option>
-                            <option value='buy'>공동구매</option>
-                            <option value='meeting'>번개</option>
-                            <option value='etc'>기타</option>
+                        <select id='category' v-model='params.matchingCategory' class='form-control'>
+                            <option value='1'>배달</option>
+                            <option value='2'>공동구매</option>
+                            <option value='3'>모임</option>
                         </select>
                     </div>
                     <div class='form-group'>
                         <br>
                         <label for='date'>매칭 마감 날짜 선택</label>
-                        <input type='date' id='date' v-model='date' class='form-control'>
+                        <input type='date' id='date' v-model='params.matchingEndDate' class='form-control'>
                     </div>
                     <div class='form-group'>
                         <br>
-                        <label for='number'>인원 선택 (최대 10명) 현재 {{ this.status_number }}명</label>
-                        <select id='number' v-model='numberDropdown' class='form-control'>
+                        <label for='number'>인원 선택 (최대 10명) 현재 {{ params.matchingCurrentHead }}명</label>
+                        <select id='number' v-model='params.matchingLimitHead' class='form-control'>
                             <option value='1'>1</option>
                             <option value='2'>2</option>
                             <option value='3'>3</option>
@@ -51,7 +51,7 @@
                         <br>
                         <textarea
                             id='content'
-                            v-model='content'
+                            v-model='params.matchingContent'
                             class='form-control'
                             rows='5'
                             placeholder='내용을 입력하세요.'
@@ -65,83 +65,71 @@
 </template>
 
 <script setup>
-
-import axios from 'axios'
-import { onMounted, ref } from 'vue'
+import { inject, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { fetchDeleteMatching, fetchMatchingDetail, fetchUpdateMatching } from '@/api/api.js'
+import { useAuthStore } from '@/stores/auth.js'
 
-const title = ref('')
-const date = ref(new Date().toISOString().substr(0, 10))
-const categoryDropdown = ref('delivery')
-const numberDropdown = ref('1')
-const content = ref('')
-const status_number = ref('')
-
+const props = defineProps({
+    id: Number,
+})
 const router = useRouter()
+const params = ref({})
+const modalHandler = inject('modalHandler')
 
-const fetchData = async () => {
-    let id = router.currentRoute.value.params.id
-    // id = 1;
-    try {
-        const response = await axios.get(`http://localhost:3000/insert/${id}`)
-        const data = response.data
-
-        title.value = data.title
-        date.value = data.date
-        categoryDropdown.value = data.category
-        numberDropdown.value = data.limit_number
-        content.value = data.content
-        status_number.value = data.status_number
-    } catch (error) {
-        console.error('Failed to fetch data:', error)
-    }
-}
+const matchingId = Number(props.id)
 
 onMounted(() => {
-    fetchData()
+    console.log('MatchingUpdate  matching id:::::', props.id)
+    getMatchingData()
 })
 
-const save = async () => {
-    const id = router.currentRoute.value.params.id
+const getMatchingData = async () => {
+    const response = await fetchMatchingDetail(matchingId)
+    console.log(':::::: getMatchingData :::::: ', response[0])
 
-    const updatedData = {
-        id: id,
-        title: title.value,
-        date: date.value,
-        category: categoryDropdown.value,
-        limit_number: numberDropdown.value,
-        status_number: status_number.value,
-        content: content.value,
-    }
+    params.value = response[0]
+}
+
+const onUpdate = async () => {
+    params.value.matchingUpdateAt = new Date().toISOString().substr(0, 10)
+
+    console.log(params.value)
+    const userEmail = await findUserEmail()
 
     try {
-        const response = await axios.put(`http://localhost:3000/insert/${id}`, updatedData)
-        alert('저장되었습니다.')
-        console.log(response)
+        await fetchUpdateMatching(userEmail, matchingId, params.value).then(() => {
+            modalHandler.openSuccess('매칭 수정 완료', '매칭이 수정되었습니다.')
+            goBack()
+        })
     } catch (error) {
-        console.error('Failed to update data:', error)
-        alert('데이터를 수정하는 데 실패했습니다.')
+        console.error('error', error)
     }
 }
 
-const cancel = () => {
+const onHandleClick = () => {
+    modalHandler.open('매칭 삭제', '정말 삭제하시겠습니까?', true, '삭제', onDelete)
+}
+
+const onDelete = async () => {
+    try {
+        await fetchDeleteMatching(await findUserEmail(), matchingId).then(() => {
+            modalHandler.close()
+            goBack()
+        })
+    } catch (error) {
+        console.error('error', error)
+    }
+}
+
+const findUserEmail = async () => {
+    return await useAuthStore().user.email
+}
+
+const goBack = () => {
     router.go(-1)
 }
 
-const deleteMatching = async () => {
-    let id = router.currentRoute.value.params.id
-    // id = 1;
-
-    try {
-        const response = await axios.delete(`http://localhost:3000/insert/${id}`)
-        alert('매칭이 삭제되었습니다.')
-        console.log(response)
-        await router.push('/') // 삭제 후 홈페이지로 이동
-    } catch (error) {
-        console.error('Failed to delete data:', error)
-        alert('매칭을 삭제하는 데 실패했습니다.')
-    }
-}
 
 </script>
 

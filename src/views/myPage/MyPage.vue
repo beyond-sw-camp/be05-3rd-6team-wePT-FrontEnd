@@ -9,35 +9,41 @@
             </div>
         </div>
         <ul class='nav' :class="{'nav-open': menuOpen }">
-            <li class='nav-item' :class="{ active: activeTab === 'created-matching' }"
-                @click="setActiveTab('created-matching')">
+            <li class='nav-item' :class="{ active: activeTab === 'createdMatch' }"
+                @click="setActiveTab('createdMatch')">
                 생성한 매칭
             </li>
-            <li class='nav-item' :class="{ active: activeTab === 'participated-matching' }"
-                @click="setActiveTab('participated-matching')">
+            <li class='nav-item' :class="{ active: activeTab === 'joinedMatch' }"
+                @click="setActiveTab('joinedMatch')">
                 참여한 매칭
             </li>
         </ul>
 
         <div class='card-container-wrapper'>
-            <div class='card-container' :class="{'show': activeTab === 'created-matching'}">
-                <b-card v-for='item in created_matching_data' :key='item.index'
-                        :title='item.category'
-                        class='mb-4 main-card'>
-                    <p class='card-text'>모집 중: {{ item.on_recruiting ? '예' : '아니오' }}</p>
-                    <p class='card-text'>참여 인원 / 인원 제한: ( {{ item.applied }} / {{ item.head_count_limit }} )</p>
-                    <p class='card-text'>생성일시: {{ item.created_at }}</p>
-                    <p class='card-text'>수정일시: {{ item.revised_at }}</p>
+            <div class='card-container' :class="{'show': activeTab === 'createdMatch'}">
+                <b-card v-for='create in createMatchingWithCategory' :key='create.matchingId'
+                        :title='create.categoryName'
+                        class='mb-4 main-card'
+                        @click='onHandleClick(create)'
+                >
+                    <p class='card-text'>제목: {{ create.matchingTitle }}</p>
+                    <p class='card-text'>모집 여부: {{ create.matchingDoneYn ? '모집 완료' : '진행 중' }}</p>
+                    <p class='card-text'>참여 인원 / 인원 제한: ( {{ create.matchingCurrentHead }} /
+                        {{ create.matchingLimitHead }} )</p>
+                    <p class='card-text'>생성 일시: {{ create.matchingCreateAt }}</p>
+                    <p class='card-text'>수정 일시: {{ create.matchingUpdateAt ?? '-' }}</p>
                 </b-card>
             </div>
 
-            <div class='card-container' :class="{'show': activeTab === 'participated-matching'}">
-                <b-card v-for='item in participated_matching_data' :key='item.id'
-                        :title='item.category'
-                        class='mb-4 main-card'>
-                    <p class='card-text'>모집 중: {{ item.on_recruiting ? '예' : '아니오' }}</p>
-                    <p class='card-text'>참여 인원 / 인원 제한: ( {{ item.applied }} / {{ item.head_count_limit }} )</p>
-                    <p class='card-text'>참여 여부: {{ item.participated_completed ? '완료' : '진행 중' }}</p>
+            <div class='card-container' :class="{'show': activeTab === 'joinedMatch'}">
+                <b-card v-for='join in joinedMatchingData' :key='join.matchingId'
+                        :title='join.categoryName'
+                        class='mb-4 main-card'
+                        @click='onHandleClick(join)'>
+                    <p class='card-text'>제목: {{ join.matchingTitle }}</p>
+                    <p class='card-text'>모집 여부: {{ join.matchingDoneYn ? '진행 중' : '모집 완료' }}</p>
+                    <p class='card-text'>참여 인원 / 인원 제한: ( {{ join.matchingCurrentHead }} / {{ join.matchingLimitHead }}
+                        )</p>
                 </b-card>
             </div>
             <div style='height: 20px' />
@@ -45,29 +51,68 @@
     </section>
 </template>
 <script setup>
-import { onMounted, onUnmounted, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
+//store
+import { useAuthStore } from '@/stores/auth.js'
+import { fetchJoinIdList, fetchMatchingDetail, fetchMyMatchingList } from '@/api/api.js'
+
+// const
+import { categoryMap } from '@/lib/const.js'
+
 const router = useRouter()
-const created_matching_data = ref([])
-const participated_matching_data = ref([])
+// data ref
+const createMatchingData = ref([])
+const joinedMatchingData = ref([])
 
-// hamburger 관련 ref
+// style ref
 const menuOpen = ref(false)
-const activeTab = ref('created-matching')
-
-// style
+const activeTab = ref('createdMatch')
 const dynamicHeight = ref('')
 
-onMounted(() => {
-    getCreatedMatchingData()
-    getParticipateMatchingData()
+onMounted(async () => {
+    const userEmail = useAuthStore().user?.email
+    if (userEmail) {
+        createMatchingData.value = await fetchMyMatchingList(userEmail)
+        await loadJoinedMatching(userEmail)
+    }
 })
 
 onUnmounted(() => {
     window.removeEventListener('resize', calculateHeight)
 })
 
+const loadJoinedMatching = async (userEmail) => {
+    const joinIdList = await fetchJoinIdList(userEmail)
+    const matchingDetailsPromises = joinIdList.map((item) => {
+        return fetchMatchingDetail(item.matchingId)
+    })
+    const matchingDetails = (await Promise.all(matchingDetailsPromises)).flat()
+
+    joinedMatchingData.value = matchingDetails.map((detail) => ({
+        ...detail,
+        categoryName: categoryMap[detail.matchingCategory] || 'Unknown',
+    }))
+
+    console.log('=== Mypage joinedMatchingData ===', joinedMatchingData.value)
+}
+
+const createMatchingWithCategory = computed(() => {
+    return createMatchingData.value.map(data => ({
+        ...data,
+        categoryName: categoryMap[data.matchingCategory] || 'Unknown',
+    }))
+})
+
+const onHandleClick = (matching) => {
+    const routeName = matching.matchingDoneYn ? 'detail' : 'update'
+    const routePath = `/matching/${routeName}/${matching.matchingId}`
+
+    router.push(routePath)
+}
+
+/* style 관련 function */
 const calculateHeight = () => {
     const subHeaderHeight = document.querySelector('.sub-header').offsetHeight
     const availableHeight = window.innerHeight - subHeaderHeight
@@ -81,32 +126,6 @@ const setActiveTab = (tab) => {
 }
 const toggleMenu = () => {
     menuOpen.value = !menuOpen.value
-}
-
-
-const getCreatedMatchingData = () => {
-    fetch('http://localhost:3000/created-matching')
-        .then(response => response.json())
-        .then(data => {
-            console.log(data)
-            created_matching_data.value = data
-        })
-        .catch(error => {
-            console.error('Error fetching data:', error)
-        })
-}
-
-
-const getParticipateMatchingData = () => {
-    fetch('http://localhost:3000/participated-matching')
-        .then(response => response.json())
-        .then(data => {
-            console.log(data)
-            participated_matching_data.value = data
-        })
-        .catch(error => {
-            console.error('Error fetching data:', error)
-        })
 }
 </script>
 

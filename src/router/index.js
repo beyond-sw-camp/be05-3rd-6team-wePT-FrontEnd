@@ -64,10 +64,11 @@ const router = createRouter({
             meta: { layout: MatchingLayout, requiresAuth: true },
         },
         {
-            path: '/matching/update',
+            path: '/matching/update/:id',
             name: 'Update',
             component: () => import('@/views/matching/MatchingUpdate.vue'),
             meta: { layout: MatchingLayout, requiresAuth: true },
+            props: true,
         },
         {
             path: '/matching/detail/:id',

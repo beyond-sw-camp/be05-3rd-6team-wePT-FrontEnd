@@ -3,16 +3,19 @@
         <div class='matching-card' v-for='match in matching' :key='match.matchingId'
              @click='changeRouter(match.matchingId)'>
             <h3 class='matching-title'>{{ match.matchingTitle }}</h3>
-            <p class='matching-info'>댓글 수: {{ match.countReply }}</p>
+            <p class='matching-info'>참여자 수: {{ match.matchingCurrentHead }}</p>
+            <!-- 참여자수로 데이터 넣음 -->
             <p class='matching-info'>조회 수: 0</p>
-            <p class='matching-info'>작성자: {{ match.Nickname }}</p>
-            <p class='matching-info'>작성 일자: {{ match.matchingDate }}</p>
+            <p class='matching-info'>작성자: {{ match.matchingOwnerName }}</p>
+            <!-- matchingId로 수정 -->
+            <p class='matching-info'>작성 일자: {{ match.matchingCreateAt }}</p>
         </div>
     </div>
 </template>
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { FindPosts } from '@/api/api.js'
 
 const router = useRouter()
 const props = defineProps({
@@ -22,89 +25,17 @@ const props = defineProps({
     },
 })
 
-const matching = ref([
-        {
-            'matchingIdx': 1,
-            'matchingId': 1,
-            'matchingTitle': 'test1',
-            'matchingDate': '2021-10-10',
-            'Nickname': 'test1',
-            'countReply': 0,
-        },
-        {
-            'matchingIdx': 2,
-            'matchingId': 2,
-            'matchingTitle': 'test2',
-            'matchingDate': '2021-10-11',
-            'Nickname': 'test2',
-            'countReply': 1,
-        },
-        {
-            'matchingIdx': 3,
-            'matchingId': 3,
-            'matchingTitle': 'test3',
-            'matchingDate': '2021-10-12',
-            'Nickname': 'test3',
-            'countReply': 2,
-        },
-        {
-            'matchingIdx': 4,
-            'matchingId': 4,
-            'matchingTitle': 'test4',
-            'matchingDate': '2021-10-13',
-            'Nickname': 'test4',
-            'countReply': 3,
-        },
-        {
-            'matchingIdx': 5,
-            'matchingId': 5,
-            'matchingTitle': 'test5',
-            'matchingDate': '2021-10-14',
-            'Nickname': 'test5',
-            'countReply': 4,
-        },
-        {
-            'matchingIdx': 6,
-            'matchingId': 6,
-            'matchingTitle': 'test6',
-            'matchingDate': '2021-10-15',
-            'Nickname': 'test6',
-            'countReply': 5,
-        },
-        {
-            'matchingIdx': 7,
-            'matchingId': 7,
-            'matchingTitle': 'test7',
-            'matchingDate': '2021-10-16',
-            'Nickname': 'test7',
-            'countReply': 6,
-        },
-        {
-            'matchingIdx': 8,
-            'matchingId': 8,
-            'matchingTitle': 'test8',
-            'matchingDate': '2021-10-17',
-            'Nickname': 'test8',
-            'countReply': 7,
-        },
-        {
-            'matchingIdx': 9,
-            'matchingId': 9,
-            'matchingTitle': 'test9',
-            'matchingDate': '2021-10-18',
-            'Nickname': 'test9',
-            'countReply': 8,
-        },
-        {
-            'matchingIdx': 10,
-            'matchingId': 10,
-            'matchingTitle': 'test10',
-            'matchingDate': '2021-10-19',
-            'Nickname': 'test10',
-            'countReply': 9,
-        },
-    ],
-)
+const FindmatchingCategory = () => {
+    if (props.service === 'delivery') {
+        return 1
+    } else if (props.service === 'groupBuying') {
+        return 2
+    } else {
+        return 3
+    }
+}
+
+const matching = ref([])
 
 const changeRouter = (id) => {
     const matchingId = id
@@ -112,6 +43,14 @@ const changeRouter = (id) => {
     router.push(`/matching/detail/${matchingId}`)
 }
 
+const matchingCategory = FindmatchingCategory()
+const getMatchingBorad = async (matchingCategory) => {
+    const matchingList = await FindPosts(matchingCategory)
+    console.log(matchingList)
+    matching.value = matchingList
+}
+
+getMatchingBorad(matchingCategory)
 </script>
 
 <style scoped>

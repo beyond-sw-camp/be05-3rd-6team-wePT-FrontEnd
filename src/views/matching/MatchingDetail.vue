@@ -5,23 +5,23 @@
             <div class='card-body'>
                 <div class='row mb-2'>
                     <div class='col-md-3 col-6 font-weight-bold'>카테고리:</div>
-                    <div class='col-md-9 col-6'>{{ params.category }}</div>
+                    <div class='col-md-9 col-6'>{{ params.matchingCategory }}</div>
                 </div>
                 <div class='row mb-2'>
                     <div class='col-md-3 col-6 font-weight-bold'>제목:</div>
-                    <div class='col-md-9 col-6'>{{ params.title }}</div>
+                    <div class='col-md-9 col-6'>{{ params.matchingTitle }}</div>
                 </div>
                 <div class='row mb-2'>
                     <div class='col-md-3 col-6 font-weight-bold'>작성일:</div>
-                    <div class='col-md-9 col-6'>{{ params.date }}</div>
+                    <div class='col-md-9 col-6'>{{ params.matchingCreateAt }}</div>
                 </div>
                 <div class='row mb-2'>
-                    <div class='col-md-3 col-6 font-weight-bold'>주최자 ID:</div>
-                    <div class='col-md-9 col-6'>{{ params.id }}</div>
+                    <div class='col-md-3 col-6 font-weight-bold'>주최자:</div>
+                    <div class='col-md-9 col-6'>{{ params.matchingOwnerName }}</div>
                 </div>
                 <div class='row'>
                     <div class='col-md-3 col-6 font-weight-bold'>인원 수:</div>
-                    <div class='col-md-9 col-6'>{{ params.status_number }} / {{ params.limit_number }}</div>
+                    <div class='col-md-9 col-6'>{{ params.matchingCurrentHead }} / {{ params.matchingLimitHead }}</div>
                 </div>
             </div>
         </div>
@@ -31,7 +31,7 @@
                 게시글 내용
             </div>
             <div class='card-body'>
-                <p class='card-text'>{{ params.content }}</p>
+                <p class='card-text'>{{ params.matchingContent }}</p>
             </div>
         </div>
 
@@ -40,45 +40,80 @@
                 참가 신청자 목록
             </div>
             <div class='card-body'>
-                <p class='card-text'>{{ secondParam.id }}</p>
+                <p class='card-text' v-for='member in joinMember' :key='member'>
+                    {{ member }}
+                </p>
             </div>
         </div>
 
-        <div class='text-center my-4 button-wrapper '>
-            <button type='button' class='btn btn-success mr-2'>참가 신청</button>
-            <button type='button' class='btn btn-danger'>참가 취소</button>
+        <div v-if='isUserCreatedMatching && isGathering' class='text-center my-4 button-wrapper '>
+            <button type='button' class='btn btn-success mr-2' @click='applyMatching'>참가 신청</button>
+            <button type='button' class='btn btn-danger' @click='cancelMatching'>참가 취소</button>
         </div>
     </section>
 </template>
 <script setup>
-
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
+import { fetchCancelJoin, fetchJoin, fetchMatchingDetail, findUserNicknamesByMatchingId } from '@/api/api.js'
+import { useAuthStore } from '@/stores/auth.js'
+import { useRouter } from 'vue-router'
 
 const props = defineProps({
     id: Number,
-    title: String,
-    date: String,
-    category: String,
-    limit_number: Number,
-    status_number: Number,
-    content: String,
+})
+const router = useRouter()
+const params = ref({})
+const joinMember = ref([])
+const matchingId = Number(props.id)
+const isUserCreatedMatching = ref(false)
+const isGathering = ref(true)
+
+onMounted(() => {
+    getUserNickname(matchingId)
+    getMatchingDetail(matchingId)
+
+    if (params.value.matchingDoneYn) {
+        isGathering.value = false
+    }
+
+    if (params.value.matchingOwnerName === findUseNickname()) {
+        console.log('일치')
+        isUserCreatedMatching.value = true
+    }
 })
 
-// 사용 예시 - 가데이터 사용을 위해 기본값 설정
-const params = ref({
-    'id': props.id || 134342,
-    'title': props.title || 'title1',
-    'date': props.date || '2024-04-15',
-    'category': props.category || 'delivery',
-    'limit_number': props.limit_number || 3,
-    'status_number': props.status_number || 1,
-    'content': props.content || 'content1dffffffsdfsdfsass',
-})
+const getMatchingDetail = async (matchingId) => {
+    const response = await fetchMatchingDetail(matchingId)
+    console.log(':::::: getMatchingDetail :::::: ', response[0])
 
-const secondParam = ref({
-    'id': 234343,
-})
+    params.value = response[0]
+}
 
+const getUserNickname = async (matchingId) => {
+    const response = await findUserNicknamesByMatchingId(matchingId)
+    console.log('::::::: getUserNickname :::::::', response)
+
+    joinMember.value = response
+}
+
+
+const findUserEmail = async () => {
+    return await useAuthStore().user.email
+}
+
+const findUseNickname = async () => {
+    return await useAuthStore().user.providerData[0].displayName
+}
+
+const applyMatching = async () => {
+    const userEmail = await findUserEmail()
+    await fetchJoin(userEmail, matchingId)
+}
+
+const cancelMatching = async () => {
+    const userEmail = await findUserEmail()
+    await fetchCancelJoin(userEmail, matchingId)
+}
 </script>
 <style scoped>
 .sub-title {

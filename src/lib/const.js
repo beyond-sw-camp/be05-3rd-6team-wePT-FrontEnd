@@ -19,5 +19,11 @@ export const matchingType = Object.freeze({
     GATHERING_KR: '모임',
 })
 
+export const categoryMap = Object.freeze({
+    1: ' 배달',
+    2: ' 공동구매',
+    3: ' 모임',
+})
+
 
 
