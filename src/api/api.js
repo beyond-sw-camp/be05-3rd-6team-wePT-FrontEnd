@@ -159,24 +159,29 @@ export const fetchMatching = async (userId, matchingData) => {
     }
 }
 
-// 글 수정
-export const updatePost = async (userId, matchingId, newData) => {
+/**
+ * @description 매칭 정보 수정
+ * @param userId
+ * @param matchingId
+ * @param newData
+ * @returns {Promise<void>}
+ */
+export const fetchUpdateMatching = async (userId, matchingId, newData) => {
     try {
         const UserCollection = collection(db, 'User')
         const userQuery = query(UserCollection, where('userEmail', '==', userId))
         const userQuerySnapshot = await getDocs(userQuery)
-        console.log('a')
+
         if (!userQuerySnapshot.empty) {
             const userDoc = userQuerySnapshot.docs[0]
             if (userDoc) {
-                const matchingCollection = collection(db, `Users/${userDoc.id}/Matching`)
+                const matchingCollection = collection(db, `User/${userDoc.id}/Matching`)
                 const postQuery = query(matchingCollection, where('matchingId', '==', matchingId))
-
                 const postQuerySnapshot = await getDocs(postQuery)
 
                 if (!postQuerySnapshot.empty) {
-                    const matchingId = postQuerySnapshot.docs[0].id
-                    const postRef = doc(matchingCollection, matchingId)
+                    const mId = postQuerySnapshot.docs[0].id
+                    const postRef = doc(matchingCollection, mId)
                     await updateDoc(postRef, newData)
                     console.log('포스트가 성공적으로 업데이트되었습니다.')
                 } else {
@@ -192,15 +197,20 @@ export const updatePost = async (userId, matchingId, newData) => {
 }
 
 
-// 글 삭제
-export const deletePost = async (userEmail, matchingId) => {
+/**
+ * @description 매칭 삭제
+ * @param userEmail
+ * @param matchingId
+ * @returns {Promise<void>}
+ */
+export const fetchDeleteMatching = async (userEmail, matchingId) => {
     try {
         const userId = await findDocumentIdByField(collection(db, 'User'), 'userEmail', userEmail)
         const userDocRef = doc(db, 'User', userId)
         const collectionInput = collection(userDocRef, 'Matching')
-        const matchingId = await findDocumentIdByField(collectionInput, 'matchingId', matchingId)
-        if (matchingId) {
-            const postDocRef = doc(db, 'User', userId, 'Matching', matchingId)
+        const mId = await findDocumentIdByField(collectionInput, 'matchingId', matchingId)
+        if (mId) {
+            const postDocRef = doc(db, 'User', userId, 'Matching', mId)
             await deleteDoc(postDocRef)
             console.log('포스트가 성공적으로 삭제되었습니다.')
         } else {
