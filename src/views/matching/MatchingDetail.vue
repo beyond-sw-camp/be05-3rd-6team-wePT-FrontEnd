@@ -114,8 +114,6 @@ const cancelMatching = async () => {
     const userEmail = await findUserEmail()
     await fetchCancelJoin(userEmail, matchingId)
 }
-
-
 </script>
 <style scoped>
 .sub-title {
