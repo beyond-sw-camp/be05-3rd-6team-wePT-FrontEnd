@@ -3,12 +3,12 @@
         <div class='matching-card' v-for='match in matching' :key='match.matchingId'
              @click='changeRouter(match.matchingId)'>
             <h3 class='matching-title'>{{ match.matchingTitle }}</h3>
-            <p class='matching-info'>댓글 수: {{ match.matchingStatusHeads }}</p>
+            <p class='matching-info'>참여자 수: {{ match.matchingCurrentHead }}</p>
             <!-- 참여자수로 데이터 넣음 -->
             <p class='matching-info'>조회 수: 0</p>
-            <p class='matching-info'>작성자: {{ match.matchingId }}</p>
+            <p class='matching-info'>작성자: {{ match.matchingOwnerName }}</p>
             <!-- matchingId로 수정 -->
-            <p class='matching-info'>작성 일자: {{ match.matchingCreatedAt }}</p>
+            <p class='matching-info'>작성 일자: {{ match.matchingCreateAt }}</p>
         </div>
     </div>
 </template>
