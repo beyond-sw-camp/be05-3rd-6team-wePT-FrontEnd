@@ -93,7 +93,10 @@ https://github.com/beyond-sw-camp/be05-3rd-6team-wePT-FrontEnd/assets/155698895/
 #### 11. 매칭 삭제
 https://github.com/beyond-sw-camp/be05-3rd-6team-wePT-FrontEnd/assets/155698895/052699d3-ad4f-409a-bd9a-7b3c96f6227a
 
-#### 14. 마이페이지 - 참여한,생성한 매칭 목록 확인
+#### 12. 매칭 참여
+https://github.com/beyond-sw-camp/be05-3rd-6team-wePT-FrontEnd/assets/155698895/52685d9d-b716-40d2-9801-eadba6d813da
+
+#### 13. 마이페이지 - 참여한,생성한 매칭 목록 확인
 https://github.com/beyond-sw-camp/be05-3rd-6team-wePT-FrontEnd/assets/155698895/054d3bdf-afec-4659-8741-c1d13b4764c8
 
 
