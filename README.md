@@ -56,7 +56,8 @@
 
 
 [화면설계서&스토리보드 (figma) 바로가기 >](https://www.figma.com/file/rhvePbbEdi8seHKtJbrdF7/Figma-for-PPT?type=design&node-id=0%3A1&mode=design&t=bPlx9ZOvdFyqSdD1-1)
-[프로토타입 (figma) 바로가기 >]([https://www.figma.com/file/rhvePbbEdi8seHKtJbrdF7/Figma-for-PPT?type=design&node-id=0%3A1&mode=design&t=bPlx9ZOvdFyqSdD1-1](https://www.figma.com/proto/rhvePbbEdi8seHKtJbrdF7/Figma-for-PPT?type=design&node-id=51-26978&t=bsT1Tt8HEFabhtk4-1&scaling=scale-down&page-id=0%3A1&starting-point-node-id=51%3A26978&show-proto-sidebar=1&mode=design))
+<br/> 
+[프로토타입 (figma) 바로가기 >](https://www.figma.com/proto/rhvePbbEdi8seHKtJbrdF7/Figma-for-PPT?type=design&node-id=51-26978&t=bsT1Tt8HEFabhtk4-1&scaling=scale-down&page-id=0%3A1&starting-point-node-id=51%3A26978&show-proto-sidebar=1&mode=design)
 
 
 
