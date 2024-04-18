@@ -180,4 +180,4 @@ nvm use
 ```
 
 
-yeeun test 지우기
+yeeun test 지우기ㄹㄹㄹ
