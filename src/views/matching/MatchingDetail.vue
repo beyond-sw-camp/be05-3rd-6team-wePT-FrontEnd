@@ -54,12 +54,14 @@
 </template>
 <script setup>
 import { onMounted, ref } from 'vue'
-import { addComment, deleteComment, fetchMatchingDetail, fetchUserNicknamesByMatchingId } from '@/api/api.js'
+import { addComment, deleteComment, fetchMatchingDetail, findUserNicknamesByMatchingId } from '@/api/api.js'
 import { useAuthStore } from '@/stores/auth.js'
+import { useRouter } from 'vue-router'
 
 const props = defineProps({
     id: Number,
 })
+const router = useRouter()
 const params = ref({})
 const joinMember = ref([])
 const matchingId = Number(props.id)
@@ -83,7 +85,7 @@ const getMatchingDetail = async (matchingId) => {
 }
 
 const getUserNickname = async (matchingId) => {
-    const response = await fetchUserNicknamesByMatchingId(matchingId)
+    const response = await findUserNicknamesByMatchingId(matchingId)
     console.log('::::::: getUserNickname :::::::', response)
 
     joinMember.value = response

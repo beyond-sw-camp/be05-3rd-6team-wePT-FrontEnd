@@ -26,8 +26,8 @@ export const FindPosts = async (id) => {
     try {
         const querySnapshot = await getDocs(UserCollection)
         await Promise.all(querySnapshot.docs.map(async (doc) => {
-            const postCollection = collection(doc.ref, 'Matching')
-            const q = query(postCollection, where('matchingCategory', '==', id),
+            const matchingCollection = collection(doc.ref, 'Matching')
+            const q = query(matchingCollection, where('matchingCategory', '==', id),
                 where('matchingDoneYn', '==', false))
             const querySnapshot = await getDocs(q)
             querySnapshot.forEach(pDoc => {
@@ -53,8 +53,8 @@ export const fetchMatchingDetail = async (matchingId) => {
     try {
         const querySnapshot = await getDocs(UserCollection)
         await Promise.all(querySnapshot.docs.map(async (doc) => {
-            const postCollection = collection(doc.ref, 'Matching')
-            const q = query(postCollection, where('matchingId', '==', matchingId))
+            const matchingCollection = collection(doc.ref, 'Matching')
+            const q = query(matchingCollection, where('matchingId', '==', matchingId))
             const querySnapshot = await getDocs(q)
             querySnapshot.forEach(pDoc => {
                 console.log('=== fetchMatchingDetail ===', pDoc.data())
@@ -126,8 +126,13 @@ export const fetchJoinIdList = async (userId) => {
     return joinMatchingIdList
 }
 
-// 글 작성 / postData는 사용 파일에서 넣어주어야함
-export const addPost = async (userId, postData) => {
+/**
+ * @description 매칭 작성
+ * @param userId
+ * @param matchingData
+ * @returns {Promise<void>}
+ */
+export const fetchMatching = async (userId, matchingData) => {
     const UserCollection = collection(db, 'User')
     const userQuery = query(UserCollection, where('userEmail', '==', userId))
 
@@ -139,8 +144,8 @@ export const addPost = async (userId, postData) => {
             // 사용자 문서가 존재하면 사용자의 포스트 컬렉션에 데이터 추가
             querySnapshot.forEach(doc => {
                 const userRef = doc.ref
-                const postCollection = collection(userRef, 'Matching')
-                addDoc(postCollection, postData).then(() => {
+                const matchingCollection = collection(userRef, 'Matching')
+                addDoc(matchingCollection, matchingData).then(() => {
                     console.log('포스트가 사용자의 포스트 컬렉션에 추가되었습니다.')
                 }).catch(error => {
                     console.error('포스트를 추가하는 중 오류 발생:', error)
@@ -164,14 +169,14 @@ export const updatePost = async (userId, matchingId, newData) => {
         if (!userQuerySnapshot.empty) {
             const userDoc = userQuerySnapshot.docs[0]
             if (userDoc) {
-                const postCollection = collection(db, `Users/${userDoc.id}/Matching`)
-                const postQuery = query(postCollection, where('matchingId', '==', matchingId))
+                const matchingCollection = collection(db, `Users/${userDoc.id}/Matching`)
+                const postQuery = query(matchingCollection, where('matchingId', '==', matchingId))
 
                 const postQuerySnapshot = await getDocs(postQuery)
 
                 if (!postQuerySnapshot.empty) {
                     const postId = postQuerySnapshot.docs[0].id
-                    const postRef = doc(postCollection, postId)
+                    const postRef = doc(matchingCollection, postId)
                     await updateDoc(postRef, newData)
                     console.log('포스트가 성공적으로 업데이트되었습니다.')
                 } else {
@@ -207,7 +212,7 @@ export const deletePost = async (userEmail, matchingId) => {
 }
 
 
-// 문서 아이ㅐ디 찾기
+// 문서 아이디 찾기
 export const findDocumentIdByField = async (collectionInput, field, value) => {
     try {
         const q = query(collectionInput, where(field, '==', value))
@@ -332,7 +337,7 @@ export const deleteComment = async (userEmail, matchingId) => {//내 이메일 ,
  * @param matchingId
  * @returns {Promise<string[]>}
  */
-export const fetchUserNicknamesByMatchingId = async (matchingId) => {
+export const findUserNicknamesByMatchingId = async (matchingId) => {
     try {
         const userCollectionRef = collection(db, 'User')
         const userCollectionSnapshot = await getDocs(userCollectionRef)

@@ -2,8 +2,8 @@
     <section style='width: 100%'>
         <div class='main-title'>매칭 생성</div>
         <div class='d-flex flex-row justify-content-end'>
-            <button class='btn btn-danger' @click='cancel'>취소</button>
-            <button class='btn btn-success' style='margin-left: 1rem' @click='save'>저장</button>
+            <button class='btn btn-danger' @click='moveBack'>취소</button>
+            <button class='btn btn-success' style='margin-left: 1rem' @click='onSave'>저장</button>
         </div>
 
 
@@ -65,7 +65,7 @@
 <script setup>
 import { useRouter } from 'vue-router'
 import { inject, onMounted, ref } from 'vue'
-import { addPost } from '@/api/api.js'
+import { fetchMatching } from '@/api/api.js'
 import { useAuthStore } from '@/stores/auth.js'
 
 const router = useRouter()
@@ -82,8 +82,6 @@ const matchingOwnerName = ref('')
 
 onMounted(async () => {
     matchingOwnerName.value = await getMatchingOwnerName()
-
-    console.log('=== matchingOwnerName ===', matchingOwnerName.value)
 })
 
 const findUserId = async () => {
@@ -95,8 +93,7 @@ const getMatchingOwnerName = async () => {
     return await useAuthStore().user.providerData[0].displayName
 }
 
-const save = async () => {
-    const userId = await findUserId()
+const onSave = async () => {
     const newData = {
         matchingId: new Date().getTime(),
         matchingTitle: title.value,
@@ -110,18 +107,24 @@ const save = async () => {
         matchingOwnerName: matchingOwnerName.value,
     }
 
-    const addMatching = async (userId, newData) => {
-        await addPost(userId, newData)
+    try {
+        const userId = await findUserId()
+        await addMatching(userId, newData)
+
+        modalHandler.open('매칭이 생성되었습니다.', '확인', true, '목록으로', moveBack)
+    } catch (error) {
+        console.error('error', error)
     }
 
-    await addMatching(userId, newData)
 }
 
-const cancel = () => {
+const addMatching = async (userId, newData) => {
+    await fetchMatching(userId, newData)
+}
+
+const moveBack = () => {
     router.go(-1)
 }
-
-
 </script>
 <style>
 /* scoped 속성을 사용하여 컴포넌트 스타일링 */
