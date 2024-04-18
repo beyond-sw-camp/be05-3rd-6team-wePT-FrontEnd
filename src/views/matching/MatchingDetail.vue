@@ -47,76 +47,65 @@
         </div>
 
         <div class='text-center my-4 button-wrapper '>
-            <button type='button' class='btn btn-success mr-2' @click="applyMatching">참가 신청</button>
-            <button type='button' class='btn btn-danger' @click="cancelMatching">참가 취소</button>
+            <button type='button' class='btn btn-success mr-2' @click='applyMatching'>참가 신청</button>
+            <button type='button' class='btn btn-danger' @click='cancelMatching'>참가 취소</button>
         </div>
     </section>
 </template>
 <script setup>
-
-import { ref , onMounted, watch} from 'vue'
-import { postDetail, addComment, deleteComment, getUserNicknamesByMatchingId } from '@/stores/firestore.js'
+import { ref } from 'vue'
+import { addComment, deleteComment, fetchMatchingDetail, getUserNicknamesByMatchingId } from '@/stores/firestore.js'
 import { useAuthStore } from '@/stores/auth.js'
 
+const params = ref({})
+const ret = ref({})
+const joinNickname = ref([])
+
 const props = defineProps({
-    id : Number
+    id: Number,
+    matchingId: Number,
+    matchingTitle: String,
+    matchingCreatedAt: Number,
+    matchingCategory: String,
+    matchingCurrentHead: Number,
+    matchingLimitHead: Number,
+    matchingContent: String,
+    matchingDoneYn: Boolean,
 })
 
-
-// 사용 예시 - 가데이터 사용을 위해 기본값 설정
-// const params = ref({
-//     'id': props.id || 134342,
-//     'title': props.title || 'title1',
-//     'date': props.date || '2024-04-15',
-//     'category': props.category || 'delivery',props.matchingCategory || 
-//     'limit_number': props.limit_number || 3,
-//     'status_number': props.status_number || 1,
-//     'content': props.content || 'content1dffffffsdfsdfsass',
-// })
-const params = ref({})
-const ret = ref({});
-const joinNickname = ref([]);
-
-
 const findUserEmail = async () => {
-    return await useAuthStore().user.email; // 로그인 한 사람
+    return await useAuthStore().user.email
 }
 
-const postId = Number(props.id);
+const matchingId = Number(props.id)
 
-const getUserNickname = async (postId) => {
-    const res = await getUserNicknamesByMatchingId(postId);
-    console.log('nickname', res);
-    joinNickname.value = res;
+const getUserNickname = async (matchingId) => {
+    const res = await getUserNicknamesByMatchingId(matchingId)
+    console.log('nickname', res)
+    joinNickname.value = res
 }
 
-const getMatchingDetail = async (postId) => {
-    const matcingDetail = await postDetail(postId);
-    params.value = matcingDetail;
-    console.log(params.value);
-    ret.value = params.value[0];
+const getMatchingDetail = async (matchingId) => {
+    params.value = await fetchMatchingDetail(matchingId)
+    console.log(params.value)
+    ret.value = params.value[0]
 }
 
 const applyMatching = async () => {
-    const userEmail = await findUserEmail(); //지금 사용자 말고, 글 작성자의 email 필요
-    await addComment(userEmail, postId);
+    const userEmail = await findUserEmail() // Wait for the promise to be fulfilled and get the result
+    await addComment(userEmail, matchingId)
 }
 
 const cancelMatching = async () => {
-    const userEmail = await findUserEmail();
-    await deleteComment(userEmail, postId);
+    const userEmail = await findUserEmail()
+    await deleteComment(userEmail, matchingId)
 }
 
-getMatchingDetail(postId);
-getUserNickname(postId);
+const checkConditions = () => {
+}
 
-// watch(ret, () => {
-//     getUserNickname(postId)
-// })
-
-// watch(ret, () => {
-//     getMatchingDetail(postId)
-// })
+getUserNickname(matchingId)
+getMatchingDetail(matchingId)
 
 </script>
 <style scoped>
