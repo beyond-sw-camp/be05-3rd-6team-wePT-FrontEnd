@@ -5,23 +5,23 @@
             <div class='card-body'>
                 <div class='row mb-2'>
                     <div class='col-md-3 col-6 font-weight-bold'>카테고리:</div>
-                    <div class='col-md-9 col-6'>{{ ret.matchingCategory }}</div>
+                    <div class='col-md-9 col-6'>{{ params.matchingCategory }}</div>
                 </div>
                 <div class='row mb-2'>
                     <div class='col-md-3 col-6 font-weight-bold'>제목:</div>
-                    <div class='col-md-9 col-6'>{{ ret.matchingTitle }}</div>
+                    <div class='col-md-9 col-6'>{{ params.matchingTitle }}</div>
                 </div>
                 <div class='row mb-2'>
                     <div class='col-md-3 col-6 font-weight-bold'>작성일:</div>
-                    <div class='col-md-9 col-6'>{{ ret.matchingCreateAt }}</div>
+                    <div class='col-md-9 col-6'>{{ params.matchingCreateAt }}</div>
                 </div>
                 <div class='row mb-2'>
-                    <div class='col-md-3 col-6 font-weight-bold'>주최자 ID:</div>
-                    <div class='col-md-9 col-6'>{{ ret.matchingId }}</div>
+                    <div class='col-md-3 col-6 font-weight-bold'>주최자:</div>
+                    <div class='col-md-9 col-6'>{{ params.matchingId }}</div>
                 </div>
                 <div class='row'>
                     <div class='col-md-3 col-6 font-weight-bold'>인원 수:</div>
-                    <div class='col-md-9 col-6'>{{ ret.matchingCurrentHead }} / {{ ret.matchingLimitHead }}</div>
+                    <div class='col-md-9 col-6'>{{ params.matchingCurrentHead }} / {{ params.matchingLimitHead }}</div>
                 </div>
             </div>
         </div>
@@ -31,7 +31,7 @@
                 게시글 내용
             </div>
             <div class='card-body'>
-                <p class='card-text'>{{ ret.matchingContent }}</p>
+                <p class='card-text'>{{ params.matchingContent }}</p>
             </div>
         </div>
 
@@ -40,59 +40,63 @@
                 참가 신청자 목록
             </div>
             <div class='card-body'>
-                <p class='card-text' v-for='param in joinNickname' :key='param'>
-                    {{ param }}
+                <p class='card-text' v-for='member in joinMember' :key='member'>
+                    {{ member }}
                 </p>
             </div>
         </div>
 
-        <div class='text-center my-4 button-wrapper '>
+        <div v-if='!isFinishedMatching' class='text-center my-4 button-wrapper '>
             <button type='button' class='btn btn-success mr-2' @click='applyMatching'>참가 신청</button>
             <button type='button' class='btn btn-danger' @click='cancelMatching'>참가 취소</button>
         </div>
     </section>
 </template>
 <script setup>
-import { ref } from 'vue'
-import { addComment, deleteComment, fetchMatchingDetail, getUserNicknamesByMatchingId } from '@/stores/firestore.js'
+import { onMounted, ref } from 'vue'
+import { addComment, deleteComment, fetchMatchingDetail, fetchUserNicknamesByMatchingId } from '@/stores/firestore.js'
 import { useAuthStore } from '@/stores/auth.js'
-
-const params = ref({})
-const ret = ref({})
-const joinNickname = ref([])
 
 const props = defineProps({
     id: Number,
-    matchingId: Number,
-    matchingTitle: String,
-    matchingCreatedAt: Number,
-    matchingCategory: String,
-    matchingCurrentHead: Number,
-    matchingLimitHead: Number,
-    matchingContent: String,
-    matchingDoneYn: Boolean,
 })
+const params = ref({})
+const joinMember = ref([])
+const matchingId = Number(props.id)
+const isUserCreatedMatching = ref(false)
+const isFinishedMatching = ref(false)
+
+onMounted(() => {
+    getUserNickname(matchingId)
+    getMatchingDetail(matchingId)
+
+    if (params.value.matchingDoneYn) {
+        isFinishedMatching.value = true
+    }
+})
+
+const getMatchingDetail = async (matchingId) => {
+    const response = await fetchMatchingDetail(matchingId)
+    console.log(':::::: getMatchingDetail :::::: ', response[0])
+
+    params.value = response[0]
+}
+
+const getUserNickname = async (matchingId) => {
+    const response = await fetchUserNicknamesByMatchingId(matchingId)
+    console.log('::::::: getUserNickname :::::::', response)
+
+    joinMember.value = response
+}
+
 
 const findUserEmail = async () => {
     return await useAuthStore().user.email
 }
 
-const matchingId = Number(props.id)
-
-const getUserNickname = async (matchingId) => {
-    const res = await getUserNicknamesByMatchingId(matchingId)
-    console.log('nickname', res)
-    joinNickname.value = res
-}
-
-const getMatchingDetail = async (matchingId) => {
-    params.value = await fetchMatchingDetail(matchingId)
-    console.log(params.value)
-    ret.value = params.value[0]
-}
 
 const applyMatching = async () => {
-    const userEmail = await findUserEmail() // Wait for the promise to be fulfilled and get the result
+    const userEmail = await findUserEmail()
     await addComment(userEmail, matchingId)
 }
 
@@ -101,11 +105,6 @@ const cancelMatching = async () => {
     await deleteComment(userEmail, matchingId)
 }
 
-const checkConditions = () => {
-}
-
-getUserNickname(matchingId)
-getMatchingDetail(matchingId)
 
 </script>
 <style scoped>

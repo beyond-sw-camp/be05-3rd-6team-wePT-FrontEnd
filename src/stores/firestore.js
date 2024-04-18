@@ -1,7 +1,10 @@
 import { addDoc, collection, deleteDoc, doc, getDocs, increment, query, updateDoc, where } from 'firebase/firestore'
 import { db } from '@/firebase/index.js'
 
-// 사용자 (전체) 출력
+/**
+ * @description 사용자 정보 반환
+ * @returns {Promise<*[]>}
+ */
 export const fetchUsers = async () => {
     const UserCollection = collection(db, 'User')
     const users = []
@@ -23,10 +26,10 @@ export const FindPosts = async (id) => {
     try {
         const querySnapshot = await getDocs(UserCollection)
         await Promise.all(querySnapshot.docs.map(async (doc) => {
-            const postCollection = collection(doc.ref, 'Matching');
+            const postCollection = collection(doc.ref, 'Matching')
             const q = query(postCollection, where('matchingCategory', '==', id),
-            where('matchingDoneYn', '==', false));
-            const querySnapshot = await getDocs(q);
+                where('matchingDoneYn', '==', false))
+            const querySnapshot = await getDocs(q)
             querySnapshot.forEach(pDoc => {
                 console.log(pDoc.data())
                 postList.push(pDoc.data())
@@ -226,28 +229,28 @@ export const findDocumentIdByField = async (collectionInput, field, value) => {
 //참여 신청
 export const addComment = async (userEmail, matchingId) => {//내 이메일 , 문서 작성 이메일 필요
     try {
-        const userCollectionRef = collection(db, 'User');
-        const userSnapshot = await getDocs(userCollectionRef);
-        let matchingWriterId;
+        const userCollectionRef = collection(db, 'User')
+        const userSnapshot = await getDocs(userCollectionRef)
+        let matchingWriterId
 
         for (const userDoc of userSnapshot.docs) {
-            const matchingCollectionRef = collection(db, `User/${userDoc.id}/Matching`);
-            const matchingQuery = query( matchingCollectionRef, where('matchingId', '==', matchingId));
-            const matchingSnapshot = await getDocs(matchingQuery);
+            const matchingCollectionRef = collection(db, `User/${userDoc.id}/Matching`)
+            const matchingQuery = query(matchingCollectionRef, where('matchingId', '==', matchingId))
+            const matchingSnapshot = await getDocs(matchingQuery)
             // matchingId가 일치하는 문서가 있는 경우 해당하는 사용자의 문서 ID 반환
             if (!matchingSnapshot.empty) {
-                matchingWriterId = userDoc.id;
-                console.log('matching' , matchingWriterId);
+                matchingWriterId = userDoc.id
+                console.log('matching', matchingWriterId)
             }
         }
 
-        const userId = await findDocumentIdByField(collection(db, 'User'), 'userEmail', userEmail); // 참여자
-        console.log(userId);
-        const userDocRef = doc(db, 'User', matchingWriterId);
+        const userId = await findDocumentIdByField(collection(db, 'User'), 'userEmail', userEmail) // 참여자
+        console.log(userId)
+        const userDocRef = doc(db, 'User', matchingWriterId)
         if (matchingWriterId) {
-            const commentCollection = collection(db, 'User', userId, 'Join');
-            const commentQuerySnapshot = await getDocs(query(commentCollection, where('matchingId', '==', matchingId)));
-            const postId = await findDocumentIdByField(collection(userDocRef, 'Matching'), 'matchingId', matchingId);
+            const commentCollection = collection(db, 'User', userId, 'Join')
+            const commentQuerySnapshot = await getDocs(query(commentCollection, where('matchingId', '==', matchingId)))
+            const postId = await findDocumentIdByField(collection(userDocRef, 'Matching'), 'matchingId', matchingId)
             if (commentQuerySnapshot.empty) {
                 await addDoc(commentCollection, { matchingId: matchingId })
                 console.log('참여 성공')
@@ -255,7 +258,7 @@ export const addComment = async (userEmail, matchingId) => {//내 이메일 , �
                 console.log('이미 참여 기록이 존재합니다.')
             }
 
-            const matchingDocRef = doc(db, `User/${matchingWriterId}/Matching/${postId}`);
+            const matchingDocRef = doc(db, `User/${matchingWriterId}/Matching/${postId}`)
 
             // 증가시킬 값
             const incrementValue = 1
@@ -274,90 +277,62 @@ export const addComment = async (userEmail, matchingId) => {//내 이메일 , �
 }
 
 
-// 참여 취소
-// export const deleteComment = async (userEmail, matchingId) => {
-//     try {
-//         const userId = await findDocumentIdByField(collection(db, 'User'), 'userEmail', userEmail);
-//         const userDocRef = doc(db, 'User', userId);
-//         const collectionInput = collection(userDocRef, 'Join');
-//         const commentDocId = await findDocumentIdByField(collectionInput, 'matchingId', matchingId);
-//         const postId = await findDocumentIdByField( collection(userDocRef, 'Matching'), 'matchingId', matchingId);
-//         if (commentDocId) {
-//             const commentDocRef = doc(db, 'User', userId, 'Join', commentDocId);
-//             await deleteDoc(commentDocRef); // 댓글 삭제
-//             console.log('댓글이 성공적으로 삭제되었습니다.');
-
-//             const matchingDocRef = doc(db, `User/${userId}/Matching/${postId}`);
-
-//             // 증가시킬 값
-//             const decrementValue = -1;
-
-//                 // 문서 업데이트
-//             await updateDoc(matchingDocRef, {
-//                 matchingCurrentHead: increment(decrementValue)
-//             });
-
-//         } else {
-//             console.error('해당 postId를 가진 댓글을 찾을 수 없습니다.');
-//         }
-//     } catch (error) {
-//         console.error('댓글을 삭제하는 중 오류 발생:', error);
-//     }
-// };
-
 export const deleteComment = async (userEmail, matchingId) => {//내 이메일 , 문서 작성 이메일 필요
     try {
-        const userCollectionRef = collection(db, 'User');
-        const userSnapshot = await getDocs(userCollectionRef);
-        let matchingWriterId;
+        const userCollectionRef = collection(db, 'User')
+        const userSnapshot = await getDocs(userCollectionRef)
+        let matchingWriterId
 
         for (const userDoc of userSnapshot.docs) {
-            const matchingCollectionRef = collection(db, `User/${userDoc.id}/Matching`);
-            const matchingQuery = query( matchingCollectionRef, where('matchingId', '==', matchingId));
-            const matchingSnapshot = await getDocs(matchingQuery);
+            const matchingCollectionRef = collection(db, `User/${userDoc.id}/Matching`)
+            const matchingQuery = query(matchingCollectionRef, where('matchingId', '==', matchingId))
+            const matchingSnapshot = await getDocs(matchingQuery)
             // matchingId가 일치하는 문서가 있는 경우 해당하는 사용자의 문서 ID 반환
             if (!matchingSnapshot.empty) {
-                matchingWriterId = userDoc.id;
-                console.log('matching' , matchingWriterId);
+                matchingWriterId = userDoc.id
+                console.log('matching', matchingWriterId)
             }
         }
 
-        const userId = await findDocumentIdByField(collection(db, 'User'), 'userEmail', userEmail); // 참여자
-        console.log(userId);
-        const userDocRef = doc(db, 'User', matchingWriterId);
+        const userId = await findDocumentIdByField(collection(db, 'User'), 'userEmail', userEmail) // 참여자
+        console.log(userId)
+        const userDocRef = doc(db, 'User', matchingWriterId)
         if (matchingWriterId) {
             // const commentCollection = collection(db, 'User', userId, 'Join');
             // const commentQuerySnapshot = await getDocs(query(commentCollection, where('matchingId', '==', matchingId)));
-            const commentDocId = await findDocumentIdByField(collection(userDocRef, 'Join'), 'matchingId', matchingId);
-            const postId = await findDocumentIdByField(collection(userDocRef, 'Matching'), 'matchingId', matchingId);
+            const commentDocId = await findDocumentIdByField(collection(userDocRef, 'Join'), 'matchingId', matchingId)
+            const postId = await findDocumentIdByField(collection(userDocRef, 'Matching'), 'matchingId', matchingId)
             if (commentDocId) {
-                const commentDocRef = doc(db, 'User', userId, 'Join', commentDocId);
-                await deleteDoc(commentDocRef); // 댓글 삭제
-                console.log('댓글이 성공적으로 삭제되었습니다.');
+                const commentDocRef = doc(db, 'User', userId, 'Join', commentDocId)
+                await deleteDoc(commentDocRef) // 댓글 삭제
+                console.log('댓글이 성공적으로 삭제되었습니다.')
 
-                const matchingDocRef = doc(db, `User/${matchingWriterId}/Matching/${postId}`);
+                const matchingDocRef = doc(db, `User/${matchingWriterId}/Matching/${postId}`)
 
                 // 증가시킬 값
-                const decrementValue = -1;
+                const decrementValue = -1
 
-                    // 문서 업데이트
+                // 문서 업데이트
                 await updateDoc(matchingDocRef, {
-                    matchingCurrentHead: increment(decrementValue)
-                });
+                    matchingCurrentHead: increment(decrementValue),
+                })
 
             } else {
-                console.error('해당 postId를 가진 댓글을 찾을 수 없습니다.');
+                console.error('해당 postId를 가진 댓글을 찾을 수 없습니다.')
             }
         }
+    } catch (error) {
+        console.error('댓글을 삭제하는 중 오류 발생:', error)
     }
-        catch (error) {
-            console.error('댓글을 삭제하는 중 오류 발생:', error);
-        }
-};
+}
 
 
-// 매칭한 닉네임 찾기
-export const getUserNicknamesByMatchingId = async (matchingId) => {
+/**
+ * @description 사용자 닉네임을 가져오는 함수
+ * @param matchingId
+ * @returns {Promise<string[]>}
+ */
+export const fetchUserNicknamesByMatchingId = async (matchingId) => {
     try {
         const userCollectionRef = collection(db, 'User')
         const userCollectionSnapshot = await getDocs(userCollectionRef)
