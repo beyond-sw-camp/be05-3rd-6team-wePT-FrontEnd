@@ -175,8 +175,8 @@ export const updatePost = async (userId, matchingId, newData) => {
                 const postQuerySnapshot = await getDocs(postQuery)
 
                 if (!postQuerySnapshot.empty) {
-                    const postId = postQuerySnapshot.docs[0].id
-                    const postRef = doc(matchingCollection, postId)
+                    const matchingId = postQuerySnapshot.docs[0].id
+                    const postRef = doc(matchingCollection, matchingId)
                     await updateDoc(postRef, newData)
                     console.log('포스트가 성공적으로 업데이트되었습니다.')
                 } else {
@@ -198,9 +198,9 @@ export const deletePost = async (userEmail, matchingId) => {
         const userId = await findDocumentIdByField(collection(db, 'User'), 'userEmail', userEmail)
         const userDocRef = doc(db, 'User', userId)
         const collectionInput = collection(userDocRef, 'Matching')
-        const postId = await findDocumentIdByField(collectionInput, 'matchingId', matchingId)
-        if (postId) {
-            const postDocRef = doc(db, 'User', userId, 'Matching', postId)
+        const matchingId = await findDocumentIdByField(collectionInput, 'matchingId', matchingId)
+        if (matchingId) {
+            const postDocRef = doc(db, 'User', userId, 'Matching', matchingId)
             await deleteDoc(postDocRef)
             console.log('포스트가 성공적으로 삭제되었습니다.')
         } else {
@@ -231,8 +231,13 @@ export const findDocumentIdByField = async (collectionInput, field, value) => {
     }
 }
 
-//참여 신청
-export const addComment = async (userEmail, matchingId) => {//내 이메일 , 문서 작성 이메일 필요
+/**
+ * @description 참여 신청
+ * @param userEmail
+ * @param matchingId
+ * @returns {Promise<void>}
+ */
+export const fetchJoin = async (userEmail, matchingId) => {
     try {
         const userCollectionRef = collection(db, 'User')
         const userSnapshot = await getDocs(userCollectionRef)
@@ -249,21 +254,23 @@ export const addComment = async (userEmail, matchingId) => {//내 이메일 , �
             }
         }
 
-        const userId = await findDocumentIdByField(collection(db, 'User'), 'userEmail', userEmail) // 참여자
+        const userId = await findDocumentIdByField(collection(db, 'User'), 'userEmail', userEmail)
         console.log(userId)
         const userDocRef = doc(db, 'User', matchingWriterId)
         if (matchingWriterId) {
-            const commentCollection = collection(db, 'User', userId, 'Join')
-            const commentQuerySnapshot = await getDocs(query(commentCollection, where('matchingId', '==', matchingId)))
-            const postId = await findDocumentIdByField(collection(userDocRef, 'Matching'), 'matchingId', matchingId)
+
+            const joinCollection = collection(db, 'User', userId, 'Join')
+            const commentQuerySnapshot = await getDocs(query(joinCollection, where('matchingId', '==', matchingId)))
+            const mId = await findDocumentIdByField(collection(userDocRef, 'Matching'), 'matchingId', matchingId)
+
             if (commentQuerySnapshot.empty) {
-                await addDoc(commentCollection, { matchingId: matchingId })
+                await addDoc(joinCollection, { matchingId: matchingId })
                 console.log('참여 성공')
             } else {
                 console.log('이미 참여 기록이 존재합니다.')
             }
 
-            const matchingDocRef = doc(db, `User/${matchingWriterId}/Matching/${postId}`)
+            const matchingDocRef = doc(db, `User/${matchingWriterId}/Matching/${mId}`)
 
             // 증가시킬 값
             const incrementValue = 1
@@ -281,8 +288,13 @@ export const addComment = async (userEmail, matchingId) => {//내 이메일 , �
     }
 }
 
-
-export const deleteComment = async (userEmail, matchingId) => {//내 이메일 , 문서 작성 이메일 필요
+/**
+ * @description 참여 신청 철회
+ * @param userEmail
+ * @param matchingId
+ * @returns {Promise<void>}
+ */
+export const fetchCancelJoin = async (userEmail, matchingId) => {
     try {
         const userCollectionRef = collection(db, 'User')
         const userSnapshot = await getDocs(userCollectionRef)
@@ -303,16 +315,15 @@ export const deleteComment = async (userEmail, matchingId) => {//내 이메일 ,
         console.log(userId)
         const userDocRef = doc(db, 'User', matchingWriterId)
         if (matchingWriterId) {
-            // const commentCollection = collection(db, 'User', userId, 'Join');
-            // const commentQuerySnapshot = await getDocs(query(commentCollection, where('matchingId', '==', matchingId)));
             const commentDocId = await findDocumentIdByField(collection(userDocRef, 'Join'), 'matchingId', matchingId)
-            const postId = await findDocumentIdByField(collection(userDocRef, 'Matching'), 'matchingId', matchingId)
+            const mId = await findDocumentIdByField(collection(userDocRef, 'Matching'), 'matchingId', matchingId)
+
             if (commentDocId) {
                 const commentDocRef = doc(db, 'User', userId, 'Join', commentDocId)
-                await deleteDoc(commentDocRef) // 댓글 삭제
-                console.log('댓글이 성공적으로 삭제되었습니다.')
+                await deleteDoc(commentDocRef)
+                console.log('참여신청이 철회 되었습니다.')
 
-                const matchingDocRef = doc(db, `User/${matchingWriterId}/Matching/${postId}`)
+                const matchingDocRef = doc(db, `User/${matchingWriterId}/Matching/${mId}`)
 
                 // 증가시킬 값
                 const decrementValue = -1
@@ -323,7 +334,7 @@ export const deleteComment = async (userEmail, matchingId) => {//내 이메일 ,
                 })
 
             } else {
-                console.error('해당 postId를 가진 댓글을 찾을 수 없습니다.')
+                console.error('해당 matchingId를 가진 join을 찾을 수 없습니다.')
             }
         }
     } catch (error) {

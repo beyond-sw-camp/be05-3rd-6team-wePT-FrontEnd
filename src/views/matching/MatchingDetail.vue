@@ -54,7 +54,7 @@
 </template>
 <script setup>
 import { onMounted, ref } from 'vue'
-import { addComment, deleteComment, fetchMatchingDetail, findUserNicknamesByMatchingId } from '@/api/api.js'
+import { fetchCancelJoin, fetchJoin, fetchMatchingDetail, findUserNicknamesByMatchingId } from '@/api/api.js'
 import { useAuthStore } from '@/stores/auth.js'
 import { useRouter } from 'vue-router'
 
@@ -107,12 +107,12 @@ const findUseNickname = async () => {
 
 const applyMatching = async () => {
     const userEmail = await findUserEmail()
-    await addComment(userEmail, matchingId)
+    await fetchJoin(userEmail, matchingId)
 }
 
 const cancelMatching = async () => {
     const userEmail = await findUserEmail()
-    await deleteComment(userEmail, matchingId)
+    await fetchCancelJoin(userEmail, matchingId)
 }
 
 
