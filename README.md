@@ -57,6 +57,40 @@
 
 [화면설계서&스토리보드 (figma) 바로가기 >](https://www.figma.com/file/rhvePbbEdi8seHKtJbrdF7/Figma-for-PPT?type=design&node-id=0%3A1&mode=design&t=MwGBstnq9lftkVQZ-1)
 
+## 🎨 테스트 영상
+
+
+#### 1. 회원가입 성공
+https://github.com/beyond-sw-camp/be05-3rd-6team-wePT-FrontEnd/assets/155698895/330c340e-5716-4883-b5e4-909aa50b3e81
+
+#### 2. 회원가입 실패-이메일 형식이 안맞음
+https://github.com/beyond-sw-camp/be05-3rd-6team-wePT-FrontEnd/assets/155698895/9aa376e7-d46d-4ecb-8d9e-99b6f984c091
+
+#### 3. 회원가입 실패-비밀번호 불일치
+https://github.com/beyond-sw-camp/be05-3rd-6team-wePT-FrontEnd/assets/155698895/91124a03-d0dc-4adf-9a9b-ae7be4311455
+
+#### 4. 회원가입 실패-닉네임 누락
+https://github.com/beyond-sw-camp/be05-3rd-6team-wePT-FrontEnd/assets/155698895/95cee892-7376-4e7c-9401-75ef728a887c
+
+#### 5. 로그인 실패-틀린 ID
+https://github.com/beyond-sw-camp/be05-3rd-6team-wePT-FrontEnd/assets/155698895/f2e71b19-b1a8-4c79-b946-5b260438dbd7
+
+#### 6. 로그인 실패-틀린 PW
+https://github.com/beyond-sw-camp/be05-3rd-6team-wePT-FrontEnd/assets/155698895/9d3fba2f-9474-4327-8098-514bff5d92c0
+
+#### 7. ID 찾기
+https://github.com/beyond-sw-camp/be05-3rd-6team-wePT-FrontEnd/assets/155698895/2154d8ae-da80-46be-b396-3daaa512638c
+
+#### 8. PW 찾기
+https://github.com/beyond-sw-camp/be05-3rd-6team-wePT-FrontEnd/assets/155698895/8459badd-5b48-40ee-926b-813dc3c72ee8
+
+#### 14. 마이페이지 - 참여한,생성한 매칭 목록 확인
+https://github.com/beyond-sw-camp/be05-3rd-6team-wePT-FrontEnd/assets/155698895/054d3bdf-afec-4659-8741-c1d13b4764c8
+
+
+
+
+
 ## 🛠️ 개발 환경
 
 * Version : Vue@3.4.21
