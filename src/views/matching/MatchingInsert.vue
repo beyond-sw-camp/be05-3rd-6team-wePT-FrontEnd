@@ -111,11 +111,16 @@ const onSave = async () => {
         const userId = await findUserId()
         await addMatching(userId, newData)
 
-        modalHandler.open('매칭이 생성되었습니다.', '확인', true, '목록으로', moveBack)
+        modalHandler.open('매칭이 생성되었습니다.', '확인', true, '목록으로', onHandleClick)
     } catch (error) {
         console.error('error', error)
     }
 
+}
+
+const onHandleClick = () => {
+    modalHandler.close()
+    moveBack()
 }
 
 const addMatching = async (userId, newData) => {
