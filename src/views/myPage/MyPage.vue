@@ -26,6 +26,7 @@
                         class='mb-4 main-card'
                         @click='onHandleClick(create)'
                 >
+                    <p class='card-text'>제목: {{ create.matchingTitle }}</p>
                     <p class='card-text'>모집 여부: {{ create.matchingDoneYn ? '모집 완료' : '진행 중' }}</p>
                     <p class='card-text'>참여 인원 / 인원 제한: ( {{ create.matchingCurrentHead }} /
                         {{ create.matchingLimitHead }} )</p>
@@ -39,6 +40,7 @@
                         :title='join.categoryName'
                         class='mb-4 main-card'
                         @click='onHandleClick(join)'>
+                    <p class='card-text'>제목: {{ join.matchingTitle }}</p>
                     <p class='card-text'>모집 여부: {{ join.matchingDoneYn ? '진행 중' : '모집 완료' }}</p>
                     <p class='card-text'>참여 인원 / 인원 제한: ( {{ join.matchingCurrentHead }} / {{ join.matchingLimitHead }}
                         )</p>
