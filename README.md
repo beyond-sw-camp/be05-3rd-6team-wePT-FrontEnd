@@ -58,6 +58,9 @@
 [화면설계서&스토리보드 (figma) 바로가기 >](https://www.figma.com/file/rhvePbbEdi8seHKtJbrdF7/Figma-for-PPT?type=design&node-id=0%3A1&mode=design&t=bPlx9ZOvdFyqSdD1-1)
 <br/> 
 [프로토타입 (figma) 바로가기 >](https://www.figma.com/proto/rhvePbbEdi8seHKtJbrdF7/Figma-for-PPT?type=design&node-id=51-26978&t=bsT1Tt8HEFabhtk4-1&scaling=scale-down&page-id=0%3A1&starting-point-node-id=51%3A26978&show-proto-sidebar=1&mode=design)
+#### 프로토타입 영상
+https://github.com/beyond-sw-camp/be05-3rd-6team-wePT-FrontEnd/assets/61785329/33545e23-b286-45bc-96b8-fc3137affe63
+
 
 
 
@@ -107,7 +110,7 @@ https://github.com/beyond-sw-camp/be05-3rd-6team-wePT-FrontEnd/assets/155698895/
 
 
 
-## 🛠️ 개발 환경
+## 🛠️ 개발 환경q2qq
 
 * Version : Vue@3.4.21
 * IDE : IntelliJ || VSCode
