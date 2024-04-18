@@ -17,7 +17,7 @@
                 </div>
                 <div class='row mb-2'>
                     <div class='col-md-3 col-6 font-weight-bold'>주최자:</div>
-                    <div class='col-md-9 col-6'>{{ params.matchingId }}</div>
+                    <div class='col-md-9 col-6'>{{ params.matchingOwnerName }}</div>
                 </div>
                 <div class='row'>
                     <div class='col-md-3 col-6 font-weight-bold'>인원 수:</div>
@@ -46,7 +46,7 @@
             </div>
         </div>
 
-        <div v-if='!isFinishedMatching' class='text-center my-4 button-wrapper '>
+        <div v-if='isUserCreatedMatching && isGathering' class='text-center my-4 button-wrapper '>
             <button type='button' class='btn btn-success mr-2' @click='applyMatching'>참가 신청</button>
             <button type='button' class='btn btn-danger' @click='cancelMatching'>참가 취소</button>
         </div>
@@ -66,14 +66,19 @@ const params = ref({})
 const joinMember = ref([])
 const matchingId = Number(props.id)
 const isUserCreatedMatching = ref(false)
-const isFinishedMatching = ref(false)
+const isGathering = ref(true)
 
 onMounted(() => {
     getUserNickname(matchingId)
     getMatchingDetail(matchingId)
 
     if (params.value.matchingDoneYn) {
-        isFinishedMatching.value = true
+        isGathering.value = false
+    }
+
+    if (params.value.matchingOwnerName === findUseNickname()) {
+        console.log('일치')
+        isUserCreatedMatching.value = true
     }
 })
 
@@ -96,6 +101,9 @@ const findUserEmail = async () => {
     return await useAuthStore().user.email
 }
 
+const findUseNickname = async () => {
+    return await useAuthStore().user.providerData[0].displayName
+}
 
 const applyMatching = async () => {
     const userEmail = await findUserEmail()
