@@ -178,3 +178,6 @@ npm run dev
 ```
 nvm use
 ```
+
+
+yeeun test 지우기
