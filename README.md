@@ -113,7 +113,7 @@ https://github.com/beyond-sw-camp/be05-3rd-6team-wePT-FrontEnd/assets/155698895/
 - FOMATTER : prettier , eslint
 
 <br/>
-<img src="https://github.com/OrangeVinyl/wePT-front/assets/105047091/f70eaa0c-33cf-42cf-abb3-318ad8a3d8f2).png">
+<img src="https://github.com/beyond-sw-camp/be05-3rd-6team-wePT-FrontEnd/assets/155809042/bd42117d-c031-4048-85fb-013074a25f81).png">
 
 <br/>
 
