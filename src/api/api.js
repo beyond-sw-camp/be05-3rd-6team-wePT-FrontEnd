@@ -328,7 +328,7 @@ export const deleteComment = async (userEmail, matchingId) => {//내 이메일 ,
 
 
 /**
- * @description 사용자 닉네임을 가져오는 함수
+ * @description 참여자 닉네임을 가져오는 함수
  * @param matchingId
  * @returns {Promise<string[]>}
  */

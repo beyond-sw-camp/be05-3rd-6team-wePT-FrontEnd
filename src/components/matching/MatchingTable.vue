@@ -3,7 +3,7 @@
         <div class='matching-card' v-for='match in matching' :key='match.matchingId'
              @click='changeRouter(match.matchingId)'>
             <h3 class='matching-title'>{{ match.matchingTitle }}</h3>
-            <p class='matching-info'>댓글 수: {{ match.matchingStatusHeads }}</p> 
+            <p class='matching-info'>댓글 수: {{ match.matchingStatusHeads }}</p>
             <!-- 참여자수로 데이터 넣음 -->
             <p class='matching-info'>조회 수: 0</p>
             <p class='matching-info'>작성자: {{ match.matchingId }}</p>
@@ -15,7 +15,7 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { FindPosts } from '@/stores/firestore.js'
+import { FindPosts } from '@/api/api.js'
 
 const router = useRouter()
 const props = defineProps({
@@ -26,16 +26,16 @@ const props = defineProps({
 })
 
 const FindmatchingCategory = () => {
-      if (props.service === 'delivery') {
-        return 1;
-      } else if (props.service === 'groupBuying') {
-        return 2;
-      } else {
-        return 3;
-      }
-    };
+    if (props.service === 'delivery') {
+        return 1
+    } else if (props.service === 'groupBuying') {
+        return 2
+    } else {
+        return 3
+    }
+}
 
-const matching = ref([]);
+const matching = ref([])
 
 const changeRouter = (id) => {
     const matchingId = id
@@ -43,14 +43,14 @@ const changeRouter = (id) => {
     router.push(`/matching/detail/${matchingId}`)
 }
 
-const matchingCategory = FindmatchingCategory();
+const matchingCategory = FindmatchingCategory()
 const getMatchingBorad = async (matchingCategory) => {
-    const matchingList = await FindPosts(matchingCategory);
-    console.log(matchingList);
-    matching.value = matchingList;
+    const matchingList = await FindPosts(matchingCategory)
+    console.log(matchingList)
+    matching.value = matchingList
 }
 
-getMatchingBorad(matchingCategory);
+getMatchingBorad(matchingCategory)
 </script>
 
 <style scoped>

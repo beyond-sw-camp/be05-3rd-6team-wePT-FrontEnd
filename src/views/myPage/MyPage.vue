@@ -54,7 +54,7 @@ import { useRouter } from 'vue-router'
 
 //store
 import { useAuthStore } from '@/stores/auth.js'
-import { fetchJoinIdList, fetchMatchingDetail, fetchMyMatchingList } from '@/stores/firestore.js'
+import { fetchJoinIdList, fetchMatchingDetail, fetchMyMatchingList } from '@/api/api.js'
 
 // const
 import { categoryMap } from '@/lib/const.js'

@@ -54,7 +54,7 @@
 </template>
 <script setup>
 import { onMounted, ref } from 'vue'
-import { addComment, deleteComment, fetchMatchingDetail, fetchUserNicknamesByMatchingId } from '@/stores/firestore.js'
+import { addComment, deleteComment, fetchMatchingDetail, fetchUserNicknamesByMatchingId } from '@/api/api.js'
 import { useAuthStore } from '@/stores/auth.js'
 
 const props = defineProps({

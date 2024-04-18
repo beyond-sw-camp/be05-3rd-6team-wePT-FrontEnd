@@ -18,9 +18,9 @@
                         <br>
                         <label for='category'>카테고리 선택</label>
                         <select id='category' v-model='categoryDropdown' class='form-control'>
-                            <option value=1>배달</option>
-                            <option value=2>공동구매</option>
-                            <option value=3>모임</option>
+                            <option value='1'>배달</option>
+                            <option value='2'>공동구매</option>
+                            <option value='3'>모임</option>
                         </select>
                     </div>
                     <div class='form-group'>
@@ -63,10 +63,9 @@
 </template>
 
 <script setup>
-import axios from 'axios'
 import { useRouter } from 'vue-router'
-import { inject, ref } from 'vue'
-import { addPost } from '@/stores/firestore.js'
+import { inject, onMounted, ref } from 'vue'
+import { addPost } from '@/api/api.js'
 import { useAuthStore } from '@/stores/auth.js'
 
 const router = useRouter()
@@ -78,13 +77,26 @@ const date = ref(new Date().toISOString().substr(0, 10))
 const categoryDropdown = ref('delivery')
 const numberDropdown = ref('1')
 const content = ref('')
-let userId
+const matchingOwnerName = ref('')
+
+
+onMounted(async () => {
+    matchingOwnerName.value = await getMatchingOwnerName()
+
+    console.log('=== matchingOwnerName ===', matchingOwnerName.value)
+})
+
 const findUserId = async () => {
-    userId = await useAuthStore().user.email;
+    return await useAuthStore().user.email
 }
 
-const save =  async () => {
-    await findUserId();
+const getMatchingOwnerName = async () => {
+    console.log('=== getMatchingOwnerName ===', typeof (useAuthStore().user.providerData[0].displayName))
+    return await useAuthStore().user.providerData[0].displayName
+}
+
+const save = async () => {
+    const userId = await findUserId()
     const newData = {
         matchingId: new Date().getTime(),
         matchingTitle: title.value,
@@ -94,16 +106,16 @@ const save =  async () => {
         matchingCurrentHead: 1,
         matchingContent: content.value,
         matchingCreateAt: new Date().toISOString().substr(0, 10),
-        matchingDoneYn : false
+        matchingDoneYn: false,
+        matchingOwnerName: matchingOwnerName.value,
     }
 
     const addMatching = async (userId, newData) => {
-        await addPost(userId, newData);
+        await addPost(userId, newData)
     }
 
-    await addMatching(userId, newData);
+    await addMatching(userId, newData)
 }
-
 
 const cancel = () => {
     router.go(-1)
